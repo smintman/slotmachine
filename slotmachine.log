@@ -1,181 +1,85 @@
-2025-11-11 01:33:16.676880 : Starting jobs
-2025-11-11 18:45:44.735763 : Starting jobs
-2025-11-11 18:46:41.691415 : Starting jobs
-2025-11-11 18:47:19.409304 : Starting jobs
-2025-11-11 18:48:45.319929 : Checking slot information please wait.
-2025-11-11 18:48:46.886747 : Current slots are:
-2025-11-11 18:48:46.893081 : Not In slot
-2025-11-11 18:48:46.924710 : Starting jobs
-2025-11-11 18:50:09.785944 : Checking slot information please wait.
-2025-11-11 18:50:11.572311 : Current slots are:
-2025-11-11 18:50:11.579875 : In slot
-2025-11-11 18:50:11.580062 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:50:55.548605 : Checking slot information please wait.
-2025-11-11 18:50:56.526713 : Current slots are:
-2025-11-11 18:50:56.528479 : In slot
-2025-11-11 18:50:56.529510 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:50:58.063346 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:50:58.083908 : Starting jobs
-2025-11-11 18:51:35.569645 : Checking slot information please wait.
-2025-11-11 18:51:36.563566 : Current slots are:
-2025-11-11 18:51:36.578833 : In slot
-2025-11-11 18:51:36.597043 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:51:38.372062 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:51:38.386130 : Starting jobs
-2025-11-11 18:52:03.570529 : Checking slot information please wait.
-2025-11-11 18:52:04.802184 : Current slots are:
-2025-11-11 18:52:04.804143 : In slot
-2025-11-11 18:52:04.804850 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:52:06.671241 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:52:06.697997 : Starting jobs
-2025-11-11 18:53:08.080784 : Checking slot information please wait.
-2025-11-11 18:53:09.546717 : Current slots are:
-2025-11-11 18:53:09.553700 : In slot
-2025-11-11 18:53:09.554474 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:53:11.384378 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:53:11.406615 : Starting jobs
-2025-11-11 18:55:14.652329 : Checking slot information please wait.
-2025-11-11 18:55:15.800872 : Current slots are:
-2025-11-11 18:55:15.801645 : In slot
-2025-11-11 18:55:15.802656 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:55:17.542795 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:55:17.558160 : Starting jobs
-2025-11-11 18:58:02.571950 : Checking slot information please wait.
-2025-11-11 18:58:03.953481 : Current slots are:
-2025-11-11 18:58:03.960851 : In slot
-2025-11-11 18:58:03.962038 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:58:36.256758 : Checking slot information please wait.
-2025-11-11 18:58:37.229877 : Current slots are:
-2025-11-11 18:58:37.251668 : In slot
-2025-11-11 18:58:37.254182 : We are in a slot checking for charge status. please wait.
-2025-11-11 18:58:38.968206 : 89
-2025-11-11 18:58:38.985226 : Unknown state: ChargeState.NOT_IN_CHARGE
-2025-11-11 18:58:38.999739 : Starting jobs
-2025-11-16 22:33:43.548014 : Checking slot information please wait.
-2025-11-16 22:33:45.236120 : Current slots are:Slot number: 1===============================Start time: 2025-11-16 22:30:00+00:00End time: 2025-11-16 23:00:00+00:00===============================
-Slot number: 2===============================Start time: 2025-11-17 02:30:00+00:00End time: 2025-11-17 04:00:00+00:00===============================
-Slot number: 3===============================Start time: 2025-11-17 04:00:00+00:00End time: 2025-11-17 04:30:00+00:00===============================
-
-2025-11-16 22:33:45.241833 : In slot
-2025-11-16 22:33:45.246862 : We are in a slot checking for charge status. please wait.
-2025-11-16 22:33:46.637176 : 53
-2025-11-16 22:33:46.642460 : We charging yay!!
-2025-11-16 22:33:46.662462 : Starting jobs
-2025-11-16 22:36:31.308943 : Checking slot information please wait.
-2025-11-16 22:36:32.079019 : Current slots are:Slot number: 1===============================Start time: 2025-11-16 22:30:00+00:00End time: 2025-11-16 23:00:00+00:00===============================
-Slot number: 2===============================Start time: 2025-11-17 02:30:00+00:00End time: 2025-11-17 04:00:00+00:00===============================
-Slot number: 3===============================Start time: 2025-11-17 04:00:00+00:00End time: 2025-11-17 04:30:00+00:00===============================
-
-2025-11-16 22:36:32.082593 : In slot
-2025-11-16 22:36:32.095199 : We are in a slot checking for charge status. please wait.
-2025-11-16 22:36:33.481407 : 53
-2025-11-16 22:36:33.482500 : We charging yay!!
-2025-11-16 22:36:33.489069 : Starting jobs
-2025-11-16 22:38:55.324875 : Checking slot information please wait.
-2025-11-16 22:38:56.503790 : Current slots are:
+2025-11-17 00:18:58.796114 : Stopping jobs
+2025-11-17 00:24:55.658858 : Starting jobs
+2025-11-17 00:24:58.620024 : Stopping jobs
+2025-11-17 00:25:01.316281 : Starting jobs
+2025-11-17 00:25:03.402129 : Stopping jobs
+2025-11-17 00:25:04.573181 : Starting jobs
+2025-11-17 00:25:05.753799 : Stopping jobs
+2025-11-17 00:26:44.602876 : Starting jobs
+2025-11-17 00:28:03.524200 : Checking slot information please wait.
+2025-11-17 00:28:04.455575 : Current slots are:
 Slot number: 1
 ===============================
-Start time: 2025-11-16 22:30:00+00:00
-End time: 2025-11-16 23:00:00+00:00
+Start time: 2025-11-17 02:30:00+00:00
+End time: 2025-11-17 03:00:00+00:00
 ===============================
 Slot number: 2
 ===============================
-Start time: 2025-11-17 02:30:00+00:00
-End time: 2025-11-17 04:00:00+00:00
+Start time: 2025-11-17 03:00:00+00:00
+End time: 2025-11-17 03:30:00+00:00
 ===============================
 Slot number: 3
 ===============================
-Start time: 2025-11-17 04:00:00+00:00
+Start time: 2025-11-17 03:30:00+00:00
+End time: 2025-11-17 03:52:00+00:00
+===============================
+Slot number: 4
+===============================
+Start time: 2025-11-17 03:52:00+00:00
 End time: 2025-11-17 04:30:00+00:00
 ===============================
 
-2025-11-16 22:38:56.510254 : In slot
-2025-11-16 22:38:56.510491 : We are in a slot checking for charge status. please wait.
-2025-11-16 22:38:58.123852 : 55
-2025-11-16 22:38:58.137642 : We charging yay!!
-2025-11-16 22:38:58.158996 : Starting jobs
-2025-11-16 22:40:13.616726 : Checking slot information please wait.
-2025-11-16 22:40:14.667640 : Current slots are:
+2025-11-17 00:28:04.460872 : Not In slot
+2025-11-17 00:28:04.464424 : Starting jobs
+2025-11-17 00:28:59.479742 : Checking slot information please wait.
+2025-11-17 00:29:00.501901 : Current slots are:
 Slot number: 1
 ===============================
-Start time: 2025-11-16 22:30:00+00:00
-End time: 2025-11-16 23:00:00+00:00
+Start time: 2025-11-17 02:30:00+00:00
+End time: 2025-11-17 03:00:00+00:00
 ===============================
 Slot number: 2
 ===============================
-Start time: 2025-11-17 02:30:00+00:00
-End time: 2025-11-17 04:00:00+00:00
+Start time: 2025-11-17 03:00:00+00:00
+End time: 2025-11-17 03:30:00+00:00
 ===============================
 Slot number: 3
 ===============================
-Start time: 2025-11-17 04:00:00+00:00
+Start time: 2025-11-17 03:30:00+00:00
+End time: 2025-11-17 03:52:00+00:00
+===============================
+Slot number: 4
+===============================
+Start time: 2025-11-17 03:52:00+00:00
 End time: 2025-11-17 04:30:00+00:00
 ===============================
 
-2025-11-16 22:40:14.686879 : In slot
-2025-11-16 22:40:14.705777 : We are in a slot checking for charge status. please wait.
-2025-11-16 22:40:16.415541 : 33
-2025-11-16 22:40:16.416282 : We charging yay!!
-2025-11-16 22:40:16.454458 : Starting jobs
-2025-11-16 22:41:34.772800 : Checking slot information please wait.
-2025-11-16 22:41:35.895837 : Current slots are:
+2025-11-17 00:29:00.503761 : Not In slot
+2025-11-17 00:29:00.509075 : Starting jobs
+2025-11-17 00:30:41.878333 : Checking slot information please wait.
+2025-11-17 00:30:42.891280 : Current slots are:
 Slot number: 1
 ===============================
-Start time: 2025-11-16 22:30:00+00:00
-End time: 2025-11-16 23:00:00+00:00
+Start time: 2025-11-17 01:53:00+00:00
+End time: 2025-11-17 02:00:00+00:00
 ===============================
 Slot number: 2
-===============================
-Start time: 2025-11-17 02:30:00+00:00
-End time: 2025-11-17 04:00:00+00:00
-===============================
-Slot number: 3
-===============================
-Start time: 2025-11-17 04:00:00+00:00
-End time: 2025-11-17 04:30:00+00:00
-===============================
-
-2025-11-16 22:41:35.906351 : In slot
-2025-11-16 22:41:35.907345 : We are in a slot checking for charge status. please wait.
-2025-11-16 22:41:37.172544 : Current battery percent is : 33
-2025-11-16 22:41:37.173444 : We charging yay!!
-2025-11-16 22:41:37.205026 : Starting jobs
-2025-11-16 23:28:32.840791 : Checking slot information please wait.
-2025-11-16 23:28:33.881490 : Current slots are:
-Slot number: 1
 ===============================
 Start time: 2025-11-17 02:30:00+00:00
 End time: 2025-11-17 03:30:00+00:00
 ===============================
-Slot number: 2
+Slot number: 3
 ===============================
 Start time: 2025-11-17 03:30:00+00:00
 End time: 2025-11-17 04:00:00+00:00
 ===============================
-Slot number: 3
+Slot number: 4
 ===============================
-Start time: 2025-11-17 04:30:00+00:00
-End time: 2025-11-17 05:00:00+00:00
-===============================
-
-2025-11-16 23:28:33.884964 : Not In slot
-2025-11-16 23:28:33.890954 : Starting jobs
-2025-11-16 23:35:00.027430 : Checking slot information please wait.
-2025-11-16 23:35:01.540657 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2025-11-17 02:30:00+00:00
-End time: 2025-11-17 03:30:00+00:00
-===============================
-Slot number: 2
-===============================
-Start time: 2025-11-17 03:30:00+00:00
-End time: 2025-11-17 04:00:00+00:00
-===============================
-Slot number: 3
-===============================
-Start time: 2025-11-17 04:30:00+00:00
-End time: 2025-11-17 05:00:00+00:00
+Start time: 2025-11-17 04:00:00+00:00
+End time: 2025-11-17 04:30:00+00:00
 ===============================
 
-2025-11-16 23:35:01.544873 : Not In slot
+2025-11-17 00:30:42.893565 : Not In slot
+2025-11-17 00:30:42.894981 : Starting jobs
+2025-11-17 00:30:51.539853 : Stopping jobs
+2025-11-17 00:30:58.818363 : Starting jobs
