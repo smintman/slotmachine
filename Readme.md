@@ -13,12 +13,12 @@ lights.
 
 You need to set the following environment vars
 
-'''
+```
 export SM_Email=""
 export SM_Password=""
 export SM_OctAPI=""
 export SM_OctAccNo = ""
-'''
+```
 
 Email and password is the my dacia app username/passeword
 
@@ -50,7 +50,7 @@ There are 2 buttons to control the system, Toggle Jobs will start/stop the job t
 
 When it program runs at these times system will check if there are any current slots and show something like this in the logs:
 
-'''
+```
 2025-11-16 22:41:35.895837 : Current slots are:
 Slot number: 1
 ===============================
@@ -67,7 +67,7 @@ Slot number: 3
 Start time: 2025-11-17 04:00:00+00:00
 End time: 2025-11-17 04:30:00+00:00
 ===============================
-'''
+```
 
 If during one of these 30 min checks we are in an octoput slot, then it will then check if the car is charging, if not it will ask the car to flash its lights to try and wake up the car, or if the car is alrady charging it will tell you.
 
