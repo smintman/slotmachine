@@ -14,10 +14,10 @@ lights.
 You need to set the following environment vars
 
 ```
-export SM_Email=""
-export SM_Password=""
-export SM_OctAPI=""
-export SM_OctAccNo = ""
+export SM_Email="sue_jones72@rocketmail.com"
+export SM_Password="kiFbob-waqpy1-gihtos"
+export SM_OctAPI="sk_live_WaiAdGuIGZsh6lt6YWgCkNSbWpYerBIM"
+export SM_OctAccNo="A-10A7F76B"
 ```
 
 Email and password is the my dacia app username/passeword

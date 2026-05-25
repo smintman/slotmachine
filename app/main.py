@@ -5,10 +5,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from apscheduler.schedulers.background import BackgroundScheduler
-#from contextlib import asynccontextmanager
 from datetime import datetime
 from os.path import isfile
-#from . import octopusSlots
 from renault_api.renault_client import RenaultClient
 from renault_api.kamereon import enums
 import os
@@ -178,7 +176,7 @@ async def checkCar():
     inSlot = checkSlot(apikey,accountNumber)
     if(inSlot):
         logger("In slot")
-        async with aiohttp.ClientSession() as websession:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as websession:
 
             logger(f"We are in a slot checking for charge status. please wait.")
 
@@ -223,10 +221,6 @@ def runLoop():
 
 runLoop()
 
-
-
-#scheduler.add_job(runLoop, 'interval', minutes=1)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -258,12 +252,24 @@ async def logs():
     isFile = isfile(logFileName)
     if isFile:
         with open(logFileName, "r") as f:
-            logcontent = f.read()
+             logcontent = f.read()
+        return """
+        <html>
+        <head>
+            <style>
+                body {
+                    background: #111;
+                    color: orange;
+                    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Courier New', Courier, monospace;
+                    font-size: 0.875rem;
+                    margin: 0;
+                    padding: 1em;
+                }
+            </style>
+        </head>
+        <body>""" + logcontent.replace("\n","<br />\n") + "</body></html>"
     else:
-        logcontent = "No logs"
-
-    return "<html><body>" + logcontent.replace("\n","<br />\n") + "</body></html>"
-
+        return "<html><body>No logs</body></html>"
 app.mount('/', StaticFiles(directory="./static", html=True), name="static")
 
 if isfile(settingsFileName):
