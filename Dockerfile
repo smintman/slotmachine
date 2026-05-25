@@ -12,7 +12,6 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 
 COPY . .
-COPY ./renault_api /renault_api
 COPY ./static /static
 
 CMD ["fastapi", "run", "app/main.py", "--port", "80"]

@@ -100,3 +100,16 @@ End time: 2026-05-26 05:00:00+01:00
 2026-05-25 16:20:32.303134 : Starting jobs
 2026-05-25 16:20:47.174690 : Stopping jobs
 2026-05-25 16:20:53.618996 : Starting jobs
+2026-05-25 16:49:15.614520 : Checking slot information please wait.
+2026-05-25 16:49:16.166818 : Current slots are:
+Slot number: 1
+===============================
+Start time: 2026-05-25 16:30:00+01:00
+End time: 2026-05-25 17:00:00+01:00
+===============================
+
+2026-05-25 16:49:16.167328 : In slot
+2026-05-25 16:49:16.167936 : We are in a slot checking for charge status. please wait.
+2026-05-25 16:49:17.692123 : Current battery percent is : 72
+2026-05-25 16:49:17.692922 : Unknown state: ChargeState.NOT_IN_CHARGE
+2026-05-25 16:49:17.697226 : Starting jobs
