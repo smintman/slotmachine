@@ -209,3 +209,5 @@ __marimo__/
 #slot machine files
 settings.json
 slotmachine.log
+slot-machine.tar
+.DS_Store
