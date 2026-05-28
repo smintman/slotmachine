@@ -12,6 +12,30 @@
 
   <script>
 
+    function about() {
+      alert("Slot Machine v3.0\n\n Author: Tim Dunne\n\n Github: https://github.com/smintman/slotmachine");
+    }
+
+    function reload_logs_iframe() {
+      const iframe = document.getElementById("logsFrame");
+      if (iframe) {
+        iframe.contentWindow.location.reload();
+      }
+    }
+
+    function updateBatteryColor(level) {
+      const batteryElement = document.getElementById("batteryLevel");
+      if (level >= 81) {
+        batteryElement.style.color = "#00ff00"; // Green
+      } else if (level >= 51) {
+        batteryElement.style.color = "#ffff00"; // Yellow
+      } else if (level >= 21) {
+        batteryElement.style.color = "#ff8800"; // Orange
+      } else {
+        batteryElement.style.color = "#ff0000"; // Red
+      }
+    }
+
     async function get_job_status() {
       const response = await fetch("/api/job_status");
       const enabled = await response.json();
@@ -46,26 +70,6 @@
         .then((json) => console.log(json));
 
         reload_logs_iframe();
-    }
-
-    function reload_logs_iframe() {
-      const iframe = document.getElementById("logsFrame");
-      if (iframe) {
-        iframe.contentWindow.location.reload();
-      }
-    }
-
-    function updateBatteryColor(level) {
-      const batteryElement = document.getElementById("batteryLevel");
-      if (level >= 81) {
-        batteryElement.style.color = "#00ff00"; // Green
-      } else if (level >= 51) {
-        batteryElement.style.color = "#ffff00"; // Yellow
-      } else if (level >= 21) {
-        batteryElement.style.color = "#ff8800"; // Orange
-      } else {
-        batteryElement.style.color = "#ff0000"; // Red
-      }
     }
 
     async function check_car(flashlights = false) {
@@ -131,6 +135,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="check_car(true);">Flash Lights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="about();">About</a>
           </li>
 
         </ul>
