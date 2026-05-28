@@ -9,6 +9,9 @@ The service, runs and at set times checks octput api to see if user is in the sl
 If they are then they we check to see if the car is charing, if not then it will flash the cars
 lights.
 
+<img width="795" height="638" alt="Screenshot 2026-05-28 at 19 50 55" src="https://github.com/user-attachments/assets/d58909a5-b923-471f-b8f9-22c91190b091" />
+
+
 # set up
 
 You need to set the following environment vars
