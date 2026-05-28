@@ -23,8 +23,12 @@ apikey= os.environ['SM_OctAPI']
 accountNumber= os.environ['SM_OctAccNo']
 
 octopusGraphUrl = "https://api.octopus.energy/v1/graphql/"
-logFileName = "slotmachine.log"
-settingsFileName = "settings.json"
+logFileName = "data/slotmachine.log"
+settingsFileName = "data/settings.json"
+
+# Ensure the data folder exists before writing logs or settings
+data_dir = os.path.dirname(logFileName)
+os.makedirs(data_dir, exist_ok=True)
 
 dateTimeToUse = datetime.now().astimezone()
 if dateTimeToUse.hour < 17:
@@ -44,12 +48,12 @@ class CarStatus:
         self.lightsFlashSent = lightsFlashSent
 
 def loadSettings():
-    with open("settings.json", "r") as f:
+    with open(settingsFileName, "r") as f:
         data = json.load(f)
         return Settings(**data)
 
 def saveSettings():
-    with open("settings.json", "w") as f:
+    with open(settingsFileName, "w") as f:
         return json.dump(settings.__dict__, f)
 
 def logger(message):
@@ -305,15 +309,49 @@ async def logs():
         <html>
         <head>
             <style>
-                body {
+                html, body {
                     background: #111;
                     color: orange;
                     font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Courier New', Courier, monospace;
                     font-size: 0.875rem;
                     margin: 0;
                     padding: 1em;
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
                 }
             </style>
+            <script>
+                let pullStartY = 0;
+                let pullDistance = 0;
+                const pullThreshold = 80;
+
+                document.addEventListener('touchstart', (event) => {
+                    if (window.scrollY === 0) {
+                        pullStartY = event.touches[0].clientY;
+                        pullDistance = 0;
+                    }
+                }, { passive: true });
+
+                document.addEventListener('touchmove', (event) => {
+                    if (pullStartY === 0) return;
+                    pullDistance = event.touches[0].clientY - pullStartY;
+                    if (pullDistance > 0) {
+                        event.preventDefault();
+                    }
+                }, { passive: false });
+
+                document.addEventListener('touchend', () => {
+                    if (pullDistance >= pullThreshold) {
+                        if (window.parent && typeof window.parent.reload_logs_iframe === 'function') {
+                            window.parent.reload_logs_iframe();
+                        } else if (window.parent) {
+                            window.parent.location.reload();
+                        }
+                    }
+                    pullStartY = 0;
+                    pullDistance = 0;
+                });
+            </script>
         </head>
         <body>""" + logcontent.replace("\n","<br />\n") + "</body></html>"
     else:
