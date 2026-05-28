@@ -75,3 +75,8 @@ End time: 2025-11-17 04:30:00+00:00
 If during one of these 30 min checks we are in an octoput slot, then it will then check if the car is charging, if not it will ask the car to flash its lights to try and wake up the car, or if the car is alrady charging it will tell you.
 
 Clear logs button will clear the current saved logs.
+
+# Docker image
+
+A docker image that has been built as in ARM architecture to host on ARM based NAS or raspberry pi can be found
+at docker.io smintman/slotmachine:latest
