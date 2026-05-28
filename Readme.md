@@ -9,6 +9,9 @@ The service, runs and at set times checks octput api to see if user is in the sl
 If they are then they we check to see if the car is charing, if not then it will flash the cars
 lights.
 
+<img width="795" height="638" alt="Screenshot 2026-05-28 at 19 50 55" src="https://github.com/user-attachments/assets/d58909a5-b923-471f-b8f9-22c91190b091" />
+
+
 # set up
 
 You need to set the following environment vars
@@ -72,3 +75,8 @@ End time: 2025-11-17 04:30:00+00:00
 If during one of these 30 min checks we are in an octoput slot, then it will then check if the car is charging, if not it will ask the car to flash its lights to try and wake up the car, or if the car is alrady charging it will tell you.
 
 Clear logs button will clear the current saved logs.
+
+# Docker image
+
+A docker image that has been built as in ARM architecture to host on ARM based NAS or raspberry pi can be found
+at docker.io smintman/slotmachine:latest
