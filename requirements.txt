@@ -6,4 +6,3 @@ requests>=2.32.5
 PyJwt>=1.4.0
 marshmallow>=4.0.1
 marshmallow_dataclass>=8.7.1
-renault_api >=0.3.0

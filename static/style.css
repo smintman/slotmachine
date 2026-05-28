@@ -12,6 +12,31 @@ body {
 	min-height: 100vh;
 }
 
+footer {
+	flex-shrink: 0;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	background-color: #333;
+	color: #ffffff;
+	font-size: 14px;
+}
+
+footer span[style*="font-weight"] {
+	color: #ffffff;
+}
+
+#batteryLevel {
+	font-weight: bold;
+	font-size: 16px;
+}
+
+#chargeStatus {
+	color: #00ffff;
+	font-weight: bold;
+	font-size: 14px;
+}
+
 main.container {
 	flex: 1 1 auto;
 	display: flex;

@@ -1,115 +1,49 @@
-2026-05-25 16:03:23.789556 : Checking slot information please wait.
-2026-05-25 16:03:24.916483 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:54:21.883630 : Checking slot information please wait.
+2026-05-28 16:54:22.496916 : Current slots are:
 
-2026-05-25 16:03:24.916975 : Not In slot
-2026-05-25 16:03:24.918804 : Starting jobs
-2026-05-25 16:05:08.793725 : Checking slot information please wait.
-2026-05-25 16:05:09.992559 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:54:22.497568 : In slot
+2026-05-28 16:54:22.499890 : We are in a slot checking for charge status. please wait.
+2026-05-28 16:54:23.871103 : Current battery percent is : 95
+2026-05-28 16:54:23.871646 : Unknown state: ChargeState.NOT_IN_CHARGE
+2026-05-28 16:54:30.458520 : Stopping jobs
+2026-05-28 16:54:32.270173 : Starting jobs
+2026-05-28 16:57:05.617930 : Checking slot information please wait.
+2026-05-28 16:57:06.810569 : Current slots are:
 
-2026-05-25 16:05:09.993261 : Not In slot
-2026-05-25 16:05:09.995372 : Starting jobs
-2026-05-25 16:05:31.317686 : Checking slot information please wait.
-2026-05-25 16:05:31.784913 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:57:06.811451 : In slot
+2026-05-28 16:57:06.812473 : We are in a slot checking for charge status. please wait.
+2026-05-28 16:57:08.062320 : Current battery percent is : 95
+2026-05-28 16:57:08.062998 : Unknown state: ChargeState.NOT_IN_CHARGE
+2026-05-28 16:57:12.078130 : Stopping jobs
+2026-05-28 16:57:15.043725 : Starting jobs
+2026-05-28 16:57:17.517267 : Stopping jobs
+2026-05-28 16:57:18.765009 : Starting jobs
+2026-05-28 16:57:38.433766 : Checking slot information please wait.
+2026-05-28 16:57:39.031915 : Current slots are:
 
-2026-05-25 16:05:31.785582 : Not In slot
-2026-05-25 16:05:31.787733 : Starting jobs
-2026-05-25 16:08:49.265497 : Checking slot information please wait.
-2026-05-25 16:08:49.979107 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:57:39.032644 : In slot
+2026-05-28 16:57:39.033608 : We are in a slot checking for charge status. please wait.
+2026-05-28 16:57:40.724356 : Current battery percent is : 95
+2026-05-28 16:57:40.726728 : Unknown state: ChargeState.NOT_IN_CHARGE
+2026-05-28 16:59:25.748899 : Starting jobs
+2026-05-28 16:59:25.751242 : Checking slot information please wait.
+2026-05-28 16:59:26.412802 : Current slots are:
 
-2026-05-25 16:08:49.979718 : Not In slot
-2026-05-25 16:08:49.981915 : Starting jobs
-2026-05-25 16:13:53.689297 : Checking slot information please wait.
-2026-05-25 16:13:54.300068 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:59:26.413397 : Not In slot
+2026-05-28 16:59:37.460007 : Checking slot information please wait.
+2026-05-28 16:59:38.160340 : Current slots are:
 
-2026-05-25 16:13:54.300384 : Not In slot
-2026-05-25 16:13:54.301756 : Starting jobs
-2026-05-25 16:15:45.821609 : Checking slot information please wait.
-2026-05-25 16:15:46.954794 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 16:59:38.161782 : In slot
+2026-05-28 16:59:38.163248 : We are in a slot checking for charge status. please wait.
+2026-05-28 16:59:39.410311 : Current battery percent is : 95
+2026-05-28 16:59:39.410894 : Car not plugged in
+2026-05-28 17:00:47.379343 : Starting jobs
+2026-05-28 17:00:47.381440 : Checking slot information please wait.
+2026-05-28 17:00:47.940884 : Current slots are:
 
-2026-05-25 16:15:46.955989 : Not In slot
-2026-05-25 16:15:46.958189 : Starting jobs
-2026-05-25 16:16:38.156857 : Checking slot information please wait.
-2026-05-25 16:16:38.687960 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
+2026-05-28 17:00:47.941321 : Not In slot
+2026-05-28 17:00:56.230322 : Starting jobs
+2026-05-28 17:00:56.232532 : Checking slot information please wait.
+2026-05-28 17:00:56.822322 : Current slots are:
 
-2026-05-25 16:16:38.688829 : Not In slot
-2026-05-25 16:16:38.691666 : Starting jobs
-2026-05-25 16:19:05.329892 : Checking slot information please wait.
-2026-05-25 16:19:05.923944 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
-
-2026-05-25 16:19:05.924473 : Not In slot
-2026-05-25 16:19:05.926299 : Starting jobs
-2026-05-25 16:20:01.792530 : Checking slot information please wait.
-2026-05-25 16:20:02.344347 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
-
-2026-05-25 16:20:02.344994 : Not In slot
-2026-05-25 16:20:02.347306 : Starting jobs
-2026-05-25 16:20:31.715573 : Checking slot information please wait.
-2026-05-25 16:20:32.301629 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-26 04:30:00+01:00
-End time: 2026-05-26 05:00:00+01:00
-===============================
-
-2026-05-25 16:20:32.301962 : Not In slot
-2026-05-25 16:20:32.303134 : Starting jobs
-2026-05-25 16:20:47.174690 : Stopping jobs
-2026-05-25 16:20:53.618996 : Starting jobs
-2026-05-25 16:49:15.614520 : Checking slot information please wait.
-2026-05-25 16:49:16.166818 : Current slots are:
-Slot number: 1
-===============================
-Start time: 2026-05-25 16:30:00+01:00
-End time: 2026-05-25 17:00:00+01:00
-===============================
-
-2026-05-25 16:49:16.167328 : In slot
-2026-05-25 16:49:16.167936 : We are in a slot checking for charge status. please wait.
-2026-05-25 16:49:17.692123 : Current battery percent is : 72
-2026-05-25 16:49:17.692922 : Unknown state: ChargeState.NOT_IN_CHARGE
-2026-05-25 16:49:17.697226 : Starting jobs
+2026-05-28 17:00:56.822804 : Not In slot

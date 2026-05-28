@@ -1,79 +1,175 @@
 <html>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="Tim Dunne">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
-  <title>Slot Machine</title>
-<head>
- 
-    <script>
-        function toggle_job()
-        {
-    
-      fetch("/api/toggle_Job",
-        {
-            method: "POST",
-            headers: {
-          "accept": "application/json",
-            },
-        })
-        .then((response) => response.json())
-        .then((json) => console.log(json));
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="Tim Dunne">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<title>Slot Machine</title>
 
-        function clear_logs()
-        {
-    
+<head>
+
+  <script>
+
+    async function get_job_status() {
+      const response = await fetch("/api/job_status");
+      const enabled = await response.json();
+      const jobsSwitch = document.getElementById("jobsSwitch");
+      jobsSwitch.checked = enabled;
+    }
+
+    async function toggle_job() {
+      const response = await fetch("/api/toggle_Job", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+        },
+      });
+      const enabled = await response.json();
+      const jobsSwitch = document.getElementById("jobsSwitch");
+      jobsSwitch.checked = enabled;
+
+      reload_logs_iframe();
+      return enabled;
+    }
+
+    function clear_logs() {
+
       fetch("/api/clear_logs",
         {
-            method: "POST",
-            headers: {
-          "accept": "application/json",
-            },
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+          },
         })
         .then((response) => response.json())
         .then((json) => console.log(json));
-        }
+    }
 
-       
-    </script>
+    function reload_logs_iframe() {
+      const iframe = document.getElementById("logsFrame");
+      if (iframe) {
+        iframe.contentWindow.location.reload();
+      }
+    }
+
+    var batteryLevel = 0;
+    var chargeStatus = "Unknown";
+
+    function updateBatteryColor(level) {
+      const batteryElement = document.getElementById("batteryLevel");
+      if (level >= 81) {
+        batteryElement.style.color = "#00ff00"; // Green
+      } else if (level >= 51) {
+        batteryElement.style.color = "#ffff00"; // Yellow
+      } else if (level >= 21) {
+        batteryElement.style.color = "#ff8800"; // Orange
+      } else {
+        batteryElement.style.color = "#ff0000"; // Red
+      }
+    }
+
+    async function check_car(flashlights = false) {
+      let response;
+      if (flashlights) {
+        response = await fetch("/api/check_car_with_flashlights");
+      }
+      else {
+        response = await fetch("/api/check_car");
+      }
+
+      carStatus = await response.json();
+
+      if (carStatus.lightsFlashSent) {
+        alert("Lights were flashed to try and wake the car. Check logs for more details.");
+      }
+
+      document.getElementById("batteryLevel").innerText = carStatus.batteryLevel;
+      document.getElementById("chargeStatus").innerText = carStatus.chargeStatus;
+      updateBatteryColor(carStatus.batteryLevel);
+
+      return carStatus;
+    }
+
+    async function flash_lights() {
+      const response = await fetch("/api/check_car_fl", { method: "POST" });
+      const result = await response.json();
+      console.log(result);
+    }
+
+    get_job_status();
+
+    check_car();
+
+  </script>
 </head>
+
 <body>
 
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark".>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark" .>
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Slot machine</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="#" onclick="toggle_job();document.location.reload();" >Toggle Jobs</a>
+          <li class="nav-item d-flex align-items-center">
+            <div class="form-check form-switch text-white">
+              <label class="form-check-label" for="jobsSwitch">Job Status</label>
+              <input class="form-check-input" type="checkbox" role="switch" id="jobsSwitch" onchange="toggle_job();">
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="clear_logs();document.location.reload();">Clear Logs</a>
           </li>
-     
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="reload_logs_iframe();">Refresh Logs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="check_car();">Check Car</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="check_car(true);">Flash Lights</a>
+          </li>
+
         </ul>
+
       </div>
+
     </div>
   </nav>
-     
 
-  <main role="main" class="container" style="height:calc(100vh - 56px);max-width:100vw;">
+
+  <main role="main" class="container" style="height:calc(100vh - 56px - 60px);max-width:100vw;">
     <div class="jumbotron" style="height:100%;">
-      <iframe src="/api/logs" title="Logs"></iframe>
-    </div>
+      <iframe id="logsFrame" src="/api/logs" title="Logs"></iframe>
   </main>
 
-    
+  <footer>
+    <div style="display: flex; gap: 40px; align-items: center; padding: 0 20px;">
+      <div>
+        <span style="font-weight: bold;">Battery Level:</span>
+        <span id="batteryLevel" style="margin-left: 10px;">0</span>%
+      </div>
+      <div>
+        <span style="font-weight: bold;">Charge Status:</span>
+        <span id="chargeStatus" style="margin-left: 10px;">Unknown</span>
+      </div>
+    </div>
+  </footer>
 
-  <!-- Bootstrap JS Bundle (includes Popper) -->  
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+
+
+  <!-- Bootstrap JS Bundle (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+    integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+    crossorigin="anonymous"></script>
 
 </body>
+
 </html>

@@ -36,6 +36,13 @@ class Settings:
     def __init__(self, job_enabled: bool):
         self.job_enabled = job_enabled
 
+class CarStatus:
+    def __init__(self, batteryLevel: int, chargeStatus: str, charging: bool = False, lightsFlashSent: bool = False):
+        self.batteryLevel = batteryLevel
+        self.chargeStatus = chargeStatus
+        self.charging = charging
+        self.lightsFlashSent = lightsFlashSent
+
 def loadSettings():
     with open("settings.json", "r") as f:
         data = json.load(f)
@@ -93,7 +100,6 @@ def refreshToken(apikey):
         }
         """
 
-       
         variables = {'api': apikey}
         r = requests.post(octopusGraphUrl, json={'query': query , 'variables': variables})
     except HTTPError as http_err:
@@ -102,7 +108,7 @@ def refreshToken(apikey):
         logger(f'Another error occurred: {err}')
 
     jsonResponse = json.loads(r.text)
-    #return jsonResponse
+
     return jsonResponse['data']['obtainKrakenToken']['token']
 
 def getObject(authToken,apikey,accountNumber):
@@ -155,26 +161,22 @@ def checkSlot(apikey,accountNumber):
         slots += (f"===============================\n")
 
     logger(slots)
-    #outputJsonString = json.dumps(times, indent=4, default=str)
-    #print(outputJsonString)
 
-    timeNow = datetime.now(timezone.utc).astimezone()
-
-    #logger(f"The current time is: {timeNow}\n")
-
+    timeNow = datetime.now(timezone.utc).astimezone(ZoneInfo("Europe/London"))
+    
     #Check to see if the current time is in a slot
     inSlot = False
     for i,time in enumerate(times):
-        slotStart = datetime.strptime(time['startDt'],'%Y-%m-%d %H:%M:%S%z').astimezone()
-        slotEnd = datetime.strptime(time['endDt'],'%Y-%m-%d %H:%M:%S%z').astimezone()
+        slotStart = datetime.strptime(time['startDt'],'%Y-%m-%d %H:%M:%S%z').astimezone(ZoneInfo("Europe/London"))
+        slotEnd = datetime.strptime(time['endDt'],'%Y-%m-%d %H:%M:%S%z').astimezone(ZoneInfo("Europe/London"))
         if(timeNow >= slotStart and timeNow <= slotEnd):
             inSlot = True
 
     return inSlot
-       
-async def checkCar():
+    
+async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False):
     inSlot = checkSlot(apikey,accountNumber)
-    if(inSlot):
+    if(inSlot or overrideSlot):
         logger("In slot")
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as websession:
 
@@ -188,36 +190,66 @@ async def checkCar():
             vehicle = (await account.get_api_vehicles())[0] #get first vehicle     
             batteryStatus = await vehicle.get_battery_status()
             chargeStatus = batteryStatus.get_charging_status()
+            chargeStatusReturn = "Unknown"
+            charging = False
+            lightsFlashSent = False
 
             logger(f"Current battery percent is : {str(batteryStatus.batteryLevel)}")
 
             if(chargeStatus == enums.ChargeState.WAITING_FOR_CURRENT_CHARGE):
+                chargeStatusReturn = "Waiting for current charge";
+                charging = False
                 logger("Still waiting to charge.")
                 logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
+                lightsFlashSent = True
 
             elif(chargeStatus == enums.ChargeState.CHARGE_IN_PROGRESS):
+                chargeStatusReturn = "Charging";
+                charging = True
                 logger("We charging yay!!")
-            elif(chargeStatus == enums.ChargeState.ENERGY_FLAP_OPENED):
+            elif(chargeStatus == enums.ChargeState.ENERGY_FLAP_OPENED or chargeStatus == enums.ChargeState.NOT_IN_CHARGE):
+                chargeStatusReturn = "Car not plugged in";
+                charging = False
                 logger("Car not plugged in")
             else:
                 logger(f"Unknown state: {chargeStatus}") 
+            
+            if overrideFlashlights:
+                logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
+                lightsFlashSent = True
+                
+
+            return CarStatus(batteryLevel=batteryStatus.batteryLevel, chargeStatus=chargeStatusReturn, charging=charging, lightsFlashSent=lightsFlashSent)
     else:
         logger("Not In slot")
 
 def get_or_create_eventloop():
     try:
-        return asyncio.get_event_loop()
+        return asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+
+    try:
+        loop = asyncio.get_event_loop()
     except RuntimeError as ex:
         if "There is no current event loop in thread" in str(ex):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            return asyncio.get_event_loop()
-        else:
-          raise ex
+            return loop
+        raise ex
+
+    if loop.is_closed():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    return loop
         
 def runLoop():
     loop = get_or_create_eventloop()
-    loop.run_until_complete(checkCar())
+    if loop.is_running():
+        loop.create_task(checkCar())
+    else:
+        loop.run_until_complete(checkCar())
 
 runLoop()
 
@@ -229,10 +261,24 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+@app.get("/api/check_car")   
+async def check_car():
+    carStatus = await checkCar(overrideSlot=True)
+    return carStatus.__dict__
+
+@app.get("/api/check_car_with_flashlights")   
+async def check_car():
+    carStatus = await checkCar(overrideSlot=True, overrideFlashlights=True)
+    return carStatus.__dict__
+
 @app.post("/api/clear_logs")
 async def clear_logs():
     clearlogs()
     return True
+
+@app.get("/api/job_status")
+async def job_status():
+    return settings.job_enabled
 
 @app.post("/api/toggle_Job")
 async def toggle_Job():
