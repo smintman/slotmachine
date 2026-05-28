@@ -30,7 +30,6 @@
       jobsSwitch.checked = enabled;
 
       reload_logs_iframe();
-      return enabled;
     }
 
     function clear_logs() {
@@ -44,6 +43,8 @@
         })
         .then((response) => response.json())
         .then((json) => console.log(json));
+
+        reload_logs_iframe();
     }
 
     function reload_logs_iframe() {
@@ -52,9 +53,6 @@
         iframe.contentWindow.location.reload();
       }
     }
-
-    var batteryLevel = 0;
-    var chargeStatus = "Unknown";
 
     function updateBatteryColor(level) {
       const batteryElement = document.getElementById("batteryLevel");
@@ -72,6 +70,9 @@
     async function check_car(flashlights = false) {
       let response;
       if (flashlights) {
+        if (!confirm("Flashing the lights may help wake the car if it's asleep, but use this option sparingly to avoid unnecessary wear on the lights. Do you want to proceed?")) {
+          return;
+        }
         response = await fetch("/api/check_car_with_flashlights");
       }
       else {
@@ -88,19 +89,16 @@
       document.getElementById("chargeStatus").innerText = carStatus.chargeStatus;
       updateBatteryColor(carStatus.batteryLevel);
 
-      return carStatus;
+      reload_logs_iframe();
     }
 
-    async function flash_lights() {
-      const response = await fetch("/api/check_car_fl", { method: "POST" });
-      const result = await response.json();
-      console.log(result);
-    }
+    var batteryLevel = 0;
+    var chargeStatus = "Unknown";
 
-    get_job_status();
-
+    window.onload = function() {
+       get_job_status();
     check_car();
-
+    };
   </script>
 </head>
 

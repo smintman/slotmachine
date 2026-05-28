@@ -150,15 +150,18 @@ def checkSlot(apikey,accountNumber):
         time['endDt'] = str(slotEnd)
         times[i] = time
 
-    slots = (f"Current slots are:\n")
+    if len(times) == 0:
+        logger("No slots found")
+        return False
+    else:
+        slots = (f"Current slots are:\n")
     
-    for i,time in enumerate(times):
-        
-        slots += (f"Slot number: {i+1}\n")
-        slots += (f"===============================\n")
-        slots += (f"Start time: {time['startDt']}\n")
-        slots += (f"End time: {time['endDt']}\n")
-        slots += (f"===============================\n")
+        for i,time in enumerate(times):
+            slots += (f"Slot number: {i+1}\n")
+            slots += (f"===============================\n")
+            slots += (f"Start time: {time['startDt']}\n")
+            slots += (f"End time: {time['endDt']}\n")
+            slots += (f"===============================\n")
 
     logger(slots)
 
@@ -177,11 +180,12 @@ def checkSlot(apikey,accountNumber):
 async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False):
     inSlot = checkSlot(apikey,accountNumber)
     if(inSlot or overrideSlot):
-        logger("In slot")
+        if inSlot:
+            logger("we are in a slot, checking car status... please wait.)")
+        else:
+            logger("we are not in a slot but override is true, checking car status... please wait.)")
+
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as websession:
-
-            logger(f"We are in a slot checking for charge status. please wait.")
-
             client = RenaultClient(websession=websession, locale="en_GB")
           
             await client.session.login(email, password)
@@ -220,8 +224,6 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
                 
 
             return CarStatus(batteryLevel=batteryStatus.batteryLevel, chargeStatus=chargeStatusReturn, charging=charging, lightsFlashSent=lightsFlashSent)
-    else:
-        logger("Not In slot")
 
 def get_or_create_eventloop():
     try:

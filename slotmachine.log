@@ -1,49 +1,17 @@
-2026-05-28 16:54:21.883630 : Checking slot information please wait.
-2026-05-28 16:54:22.496916 : Current slots are:
-
-2026-05-28 16:54:22.497568 : In slot
-2026-05-28 16:54:22.499890 : We are in a slot checking for charge status. please wait.
-2026-05-28 16:54:23.871103 : Current battery percent is : 95
-2026-05-28 16:54:23.871646 : Unknown state: ChargeState.NOT_IN_CHARGE
-2026-05-28 16:54:30.458520 : Stopping jobs
-2026-05-28 16:54:32.270173 : Starting jobs
-2026-05-28 16:57:05.617930 : Checking slot information please wait.
-2026-05-28 16:57:06.810569 : Current slots are:
-
-2026-05-28 16:57:06.811451 : In slot
-2026-05-28 16:57:06.812473 : We are in a slot checking for charge status. please wait.
-2026-05-28 16:57:08.062320 : Current battery percent is : 95
-2026-05-28 16:57:08.062998 : Unknown state: ChargeState.NOT_IN_CHARGE
-2026-05-28 16:57:12.078130 : Stopping jobs
-2026-05-28 16:57:15.043725 : Starting jobs
-2026-05-28 16:57:17.517267 : Stopping jobs
-2026-05-28 16:57:18.765009 : Starting jobs
-2026-05-28 16:57:38.433766 : Checking slot information please wait.
-2026-05-28 16:57:39.031915 : Current slots are:
-
-2026-05-28 16:57:39.032644 : In slot
-2026-05-28 16:57:39.033608 : We are in a slot checking for charge status. please wait.
-2026-05-28 16:57:40.724356 : Current battery percent is : 95
-2026-05-28 16:57:40.726728 : Unknown state: ChargeState.NOT_IN_CHARGE
-2026-05-28 16:59:25.748899 : Starting jobs
-2026-05-28 16:59:25.751242 : Checking slot information please wait.
-2026-05-28 16:59:26.412802 : Current slots are:
-
-2026-05-28 16:59:26.413397 : Not In slot
-2026-05-28 16:59:37.460007 : Checking slot information please wait.
-2026-05-28 16:59:38.160340 : Current slots are:
-
-2026-05-28 16:59:38.161782 : In slot
-2026-05-28 16:59:38.163248 : We are in a slot checking for charge status. please wait.
-2026-05-28 16:59:39.410311 : Current battery percent is : 95
-2026-05-28 16:59:39.410894 : Car not plugged in
-2026-05-28 17:00:47.379343 : Starting jobs
-2026-05-28 17:00:47.381440 : Checking slot information please wait.
-2026-05-28 17:00:47.940884 : Current slots are:
-
-2026-05-28 17:00:47.941321 : Not In slot
-2026-05-28 17:00:56.230322 : Starting jobs
-2026-05-28 17:00:56.232532 : Checking slot information please wait.
-2026-05-28 17:00:56.822322 : Current slots are:
-
-2026-05-28 17:00:56.822804 : Not In slot
+2026-05-28 18:29:55.183681 : Checking slot information please wait.
+2026-05-28 18:29:55.889069 : No slots found
+2026-05-28 18:29:55.889599 : we are not in a slot but override is true, checking car status... please wait.)
+2026-05-28 18:29:57.203544 : Current battery percent is : 94
+2026-05-28 18:29:57.204328 : Car not plugged in
+2026-05-28 18:30:08.266604 : Stopping jobs
+2026-05-28 18:30:11.374511 : Starting jobs
+2026-05-28 18:30:14.934802 : Checking slot information please wait.
+2026-05-28 18:30:15.585916 : No slots found
+2026-05-28 18:30:15.586566 : we are not in a slot but override is true, checking car status... please wait.)
+2026-05-28 18:30:16.887743 : Current battery percent is : 94
+2026-05-28 18:30:16.888484 : Car not plugged in
+2026-05-28 18:31:31.471837 : Checking slot information please wait.
+2026-05-28 18:31:32.066971 : No slots found
+2026-05-28 18:31:32.067525 : we are not in a slot but override is true, checking car status... please wait.)
+2026-05-28 18:31:33.655158 : Current battery percent is : 94
+2026-05-28 18:31:33.655994 : Car not plugged in
