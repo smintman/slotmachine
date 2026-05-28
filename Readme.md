@@ -83,4 +83,4 @@ at docker.io smintman/slotmachine:latest
 
 # Special thanks
 
-To https://github.com/hacf-fr/renault-api as their library does most of the heavy lifting.. I've included a fork of their library in my solution for moment because it has issues working with the spring 2 car. I intend on raising this as PR in the future and replace my fork with a dependency.
+To https://github.com/hacf-fr/renault-api as their library does most of the heavy lifting.. I've included a fork of their library in my solution for moment because it has issues working with the spring 2. I intend on raising this as PR in the future and replace my fork with a dependency.
