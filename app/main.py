@@ -13,6 +13,7 @@ import os
 import aiohttp
 import asyncio
 import json
+import logging
 from datetime import date, datetime,timezone,timedelta
 from zoneinfo import ZoneInfo
 
@@ -24,6 +25,17 @@ accountNumber= os.environ['SM_OctAccNo']
 octopusGraphUrl = "https://api.octopus.energy/v1/graphql/"
 logFileName = "data/slotmachine.log"
 settingsFileName = "data/settings.json"
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s : %(message)s',
+    handlers=[
+        logging.FileHandler(logFileName),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Ensure the data folder exists before writing logs or settings
 data_dir = os.path.dirname(logFileName)
@@ -55,13 +67,6 @@ def saveSettings():
     with open(settingsFileName, "w") as f:
         return json.dump(settings.__dict__, f)
 
-def logger(message):
-    message = str(datetime.now()) + " : " + message + "\n"
-    print(message)
-    with open(logFileName, "a") as f:
-        f.write(message)
-
-
 scheduler = AsyncIOScheduler()
 scheduler.start()
 app = FastAPI()
@@ -72,7 +77,7 @@ def clearlogs():
 
 def startJobs():
 
-    logger("Starting jobs")
+    logger.info("Starting jobs")
 
     scheduler.add_job(checkCar, 'cron', 
                   day_of_week='*', 
@@ -86,7 +91,7 @@ def startJobs():
     
 def stopJobs():
 
-    logger("Stopping jobs")
+    logger.info("Stopping jobs")
     if scheduler.get_job('job1') != None:
         scheduler.remove_job('job1')
 
@@ -128,14 +133,14 @@ async def getTimes(session, authToken, accountNumber):
     return data['plannedDispatches']
 
 async def checkSlot(session):
-    logger(f"Checking slot information please wait.")
+    logger.info("Checking slot information please wait.")
 
     try:
         #Get Token
         authToken = await refreshToken(session, apikey)
         times = await getTimes(session, authToken, accountNumber)
     except Exception as err:
-        logger(f'Error checking Octopus slots: {err}')
+        logger.error(f"Error checking Octopus slots: {err}")
         return False
 
     #Convert to the current timezone
@@ -147,7 +152,7 @@ async def checkSlot(session):
         times[i] = time
 
     if len(times) == 0:
-        logger("No slots found")
+        logger.info("No slots found")
         return False
     else:
         slots = (f"Current slots are:\n")
@@ -159,7 +164,7 @@ async def checkSlot(session):
             slots += (f"End time: {time['endDt']}\n")
             slots += (f"===============================\n")
 
-    logger(slots)
+    logger.info(slots)
 
     timeNow = datetime.now(timezone.utc).astimezone(ZoneInfo("Europe/London"))
     
@@ -178,9 +183,9 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
         inSlot = await checkSlot(websession)
         if(inSlot or overrideSlot):
             if inSlot:
-                logger("we are in a slot, checking car status... please wait.)")
+                logger.info("we are in a slot, checking car status... please wait.")
             else:
-                logger("we are not in a slot but override is true, checking car status... please wait.")
+                logger.info("we are not in a slot but override is true, checking car status... please wait.")
 
             client = RenaultClient(websession=websession, locale="en_GB")
           
@@ -194,36 +199,36 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
             charging = False
             lightsFlashSent = False
 
-            logger(f"Current battery percent is : {str(batteryStatus.batteryLevel)}")
+            logger.info(f"Current battery percent is : {str(batteryStatus.batteryLevel)}")
 
             if(chargeStatus == enums.ChargeState.WAITING_FOR_CURRENT_CHARGE):
                 chargeStatusReturn = "Waiting for current charge";
                 charging = False
-                logger("Still waiting to charge.")
+                logger.info("Still waiting to charge.")
          
                 if inSlot:
-                    logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
+                    logger.info(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
                     lightsFlashSent = True
 
             elif(chargeStatus == enums.ChargeState.CHARGE_IN_PROGRESS):
                 chargeStatusReturn = "Charging";
                 charging = True
-                logger("We charging yay!!")
+                logger.info("We charging yay!!")
             elif(chargeStatus == enums.ChargeState.ENERGY_FLAP_OPENED or chargeStatus == enums.ChargeState.NOT_IN_CHARGE):
                 chargeStatusReturn = "Car not plugged in";
                 charging = False
-                logger("Car not plugged in")
+                logger.info("Car not plugged in")
             else:
-                logger(f"Unknown state: {chargeStatus}") 
+                logger.info(f"Unknown state: {chargeStatus}") 
             
             if overrideFlashlights:
-                logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
+                logger.info(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
                 lightsFlashSent = True
                 
 
             return CarStatus(batteryLevel=batteryStatus.batteryLevel, chargeStatus=chargeStatusReturn, charging=charging, lightsFlashSent=lightsFlashSent)
         else:
-            logger("Not in a slot, skipping car check.")
+            logger.info("Not in a slot, skipping car check.")
 
 def get_or_create_eventloop():
     try:
