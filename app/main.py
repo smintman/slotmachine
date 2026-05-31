@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 #from time import sleep
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -26,6 +27,10 @@ octopusGraphUrl = "https://api.octopus.energy/v1/graphql/"
 logFileName = "data/slotmachine.log"
 settingsFileName = "data/settings.json"
 
+# Ensure the data folder exists before writing logs or settings
+data_dir = os.path.dirname(logFileName)
+os.makedirs(data_dir, exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -36,10 +41,6 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
-
-# Ensure the data folder exists before writing logs or settings
-data_dir = os.path.dirname(logFileName)
-os.makedirs(data_dir, exist_ok=True)
 
 dateTimeToUse = datetime.now().astimezone()
 if dateTimeToUse.hour < 17:
@@ -68,8 +69,24 @@ def saveSettings():
         return json.dump(settings.__dict__, f)
 
 scheduler = AsyncIOScheduler()
-scheduler.start()
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start the scheduler within the FastAPI event loop
+    scheduler.start()
+    
+    # Start background jobs if they are enabled in settings
+    if settings.job_enabled:
+        startJobs()
+    
+    # Perform an initial car check immediately on startup
+    asyncio.create_task(checkCar())
+    
+    yield
+    # Graceful shutdown
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=lifespan)
 
 def clearlogs():
      with open(logFileName, "w") as f:
@@ -230,36 +247,6 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
         else:
             logger.info("Not in a slot, skipping car check.")
 
-def get_or_create_eventloop():
-    try:
-        return asyncio.get_running_loop()
-    except RuntimeError:
-        pass
-
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError as ex:
-        if "There is no current event loop in thread" in str(ex):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            return loop
-        raise ex
-
-    if loop.is_closed():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    return loop
-        
-def runLoop():
-    loop = get_or_create_eventloop()
-    if loop.is_running():
-        loop.create_task(checkCar())
-    else:
-        loop.run_until_complete(checkCar())
-
-runLoop()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -308,13 +295,8 @@ async def get_logs():
     return ""
 app.mount('/', StaticFiles(directory="./static", html=True), name="static")
 
+# Initialize settings at module level
 if isfile(settingsFileName):
-    #Load existings settings
     settings = loadSettings()
-
-    if settings.job_enabled:
-        startJobs()
 else:
-    #Create new default settings
     settings = Settings(job_enabled=True)
-    startJobs()
