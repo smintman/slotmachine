@@ -1,10 +1,10 @@
 #from time import sleep
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 from os.path import isfile
 from renault_api.renault_client import RenaultClient
@@ -12,9 +12,8 @@ from renault_api.kamereon import enums
 import os
 import aiohttp
 import asyncio
-import requests,json
+import json
 from datetime import date, datetime,timezone,timedelta
-from requests.models import HTTPError
 from zoneinfo import ZoneInfo
 
 email = os.environ['SM_Email']
@@ -63,7 +62,7 @@ def logger(message):
         f.write(message)
 
 
-scheduler = BackgroundScheduler()
+scheduler = AsyncIOScheduler()
 scheduler.start()
 app = FastAPI()
 
@@ -75,14 +74,14 @@ def startJobs():
 
     logger("Starting jobs")
 
-    scheduler.add_job(runLoop, 'cron', 
+    scheduler.add_job(checkCar, 'cron', 
                   day_of_week='*', 
                   hour='0-7', 
                   minute='05-35/30',id='job1')
 
-    scheduler.add_job(runLoop, 'cron', 
+    scheduler.add_job(checkCar, 'cron', 
                   day_of_week='*', 
-                  hour='23', 
+                  hour='22-23', 
                   minute='05-35/30',id='job2')
     
 def stopJobs():
@@ -94,57 +93,50 @@ def stopJobs():
     if scheduler.get_job('job2') != None:
         scheduler.remove_job('job2')
 
-def refreshToken(apikey):
-    try:
-        query = """
-        mutation krakenTokenAuthentication($api: String!) {
-        obtainKrakenToken(input: {APIKey: $api}) {
-            token
-        }
-        }
-        """
+async def refreshToken(session, apikey):
+    query = """
+    mutation krakenTokenAuthentication($api: String!) {
+    obtainKrakenToken(input: {APIKey: $api}) {
+        token
+    }
+    }
+    """
+    variables = {'api': apikey}
+    async with session.post(octopusGraphUrl, json={'query': query, 'variables': variables}) as response:
+        response.raise_for_status()
+        jsonResponse = await response.json()
+        return jsonResponse['data']['obtainKrakenToken']['token']
 
-        variables = {'api': apikey}
-        r = requests.post(octopusGraphUrl, json={'query': query , 'variables': variables})
-    except HTTPError as http_err:
-        logger(f'HTTP Error {http_err}')
-    except Exception as err:
-        logger(f'Another error occurred: {err}')
-
-    jsonResponse = json.loads(r.text)
-
-    return jsonResponse['data']['obtainKrakenToken']['token']
-
-def getObject(authToken,apikey,accountNumber):
-    try:
-        query = """
-            query getData($input: String!) {
-                plannedDispatches(accountNumber: $input) {
-                    startDt
-                    endDt
-                }
+async def getObject(session, authToken, accountNumber):
+    query = """
+        query getData($input: String!) {
+            plannedDispatches(accountNumber: $input) {
+                startDt
+                endDt
             }
-        """
-        variables = {'input': accountNumber}
-        headers={"Authorization": authToken}
-        r = requests.post(octopusGraphUrl, json={'query': query , 'variables': variables, 'operationName': 'getData'},headers=headers)
-        return json.loads(r.text)['data']
-    except HTTPError as http_err:
-        logger(f'HTTP Error {http_err}')
-    except Exception as err:
-        logger(f'Another error occurred: {err}')
+        }
+    """
+    variables = {'input': accountNumber}
+    headers = {"Authorization": authToken}
+    async with session.post(octopusGraphUrl, json={'query': query, 'variables': variables, 'operationName': 'getData'}, headers=headers) as response:
+        response.raise_for_status()
+        jsonResponse = await response.json()
+        return jsonResponse['data']
 
-def getTimes(authToken,apikey,accountNumber):
-    object = getObject(authToken,apikey,accountNumber)
-    #print(object)
-    return object['plannedDispatches']
+async def getTimes(session, authToken, accountNumber):
+    data = await getObject(session, authToken, accountNumber)
+    return data['plannedDispatches']
 
-def checkSlot(apikey,accountNumber):
+async def checkSlot(session):
     logger(f"Checking slot information please wait.")
 
-    #Get Token
-    authToken = refreshToken(apikey)
-    times = getTimes(authToken,apikey,accountNumber)
+    try:
+        #Get Token
+        authToken = await refreshToken(session, apikey)
+        times = await getTimes(session, authToken, accountNumber)
+    except Exception as err:
+        logger(f'Error checking Octopus slots: {err}')
+        return False
 
     #Convert to the current timezone
     for i,time in enumerate(times):
@@ -182,14 +174,14 @@ def checkSlot(apikey,accountNumber):
     return inSlot
     
 async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False):
-    inSlot = checkSlot(apikey,accountNumber)
-    if(inSlot or overrideSlot):
-        if inSlot:
-            logger("we are in a slot, checking car status... please wait.)")
-        else:
-            logger("we are not in a slot but override is true, checking car status... please wait.)")
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as websession:
+        inSlot = await checkSlot(websession)
+        if(inSlot or overrideSlot):
+            if inSlot:
+                logger("we are in a slot, checking car status... please wait.)")
+            else:
+                logger("we are not in a slot but override is true, checking car status... please wait.")
 
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as websession:
             client = RenaultClient(websession=websession, locale="en_GB")
           
             await client.session.login(email, password)
@@ -208,8 +200,10 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
                 chargeStatusReturn = "Waiting for current charge";
                 charging = False
                 logger("Still waiting to charge.")
-                logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
-                lightsFlashSent = True
+         
+                if inSlot:
+                    logger(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
+                    lightsFlashSent = True
 
             elif(chargeStatus == enums.ChargeState.CHARGE_IN_PROGRESS):
                 chargeStatusReturn = "Charging";
@@ -228,6 +222,8 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
                 
 
             return CarStatus(batteryLevel=batteryStatus.batteryLevel, chargeStatus=chargeStatusReturn, charging=charging, lightsFlashSent=lightsFlashSent)
+        else:
+            logger("Not in a slot, skipping car check.")
 
 def get_or_create_eventloop():
     try:
@@ -273,7 +269,7 @@ async def check_car():
     return carStatus.__dict__
 
 @app.get("/api/check_car_with_flashlights")   
-async def check_car():
+async def check_car_with_flashlights():
     carStatus = await checkCar(overrideSlot=True, overrideFlashlights=True)
     return carStatus.__dict__
 
@@ -299,63 +295,12 @@ async def toggle_Job():
         startJobs()
         return settings.job_enabled
 
-@app.get("/api/logs", response_class=HTMLResponse)
-async def logs():
-    isFile = isfile(logFileName)
-    if isFile:
+@app.get("/api/logs", response_class=PlainTextResponse)
+async def get_logs():
+    if isfile(logFileName):
         with open(logFileName, "r") as f:
-             logcontent = f.read()
-        return """
-        <html>
-        <head>
-            <style>
-                html, body {
-                    background: #111;
-                    color: orange;
-                    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Courier New', Courier, monospace;
-                    font-size: 0.875rem;
-                    margin: 0;
-                    padding: 1em;
-                    -webkit-overflow-scrolling: touch;
-                    overscroll-behavior: contain;
-                }
-            </style>
-            <script>
-                let pullStartY = 0;
-                let pullDistance = 0;
-                const pullThreshold = 80;
-
-                document.addEventListener('touchstart', (event) => {
-                    if (window.scrollY === 0) {
-                        pullStartY = event.touches[0].clientY;
-                        pullDistance = 0;
-                    }
-                }, { passive: true });
-
-                document.addEventListener('touchmove', (event) => {
-                    if (pullStartY === 0) return;
-                    pullDistance = event.touches[0].clientY - pullStartY;
-                    if (pullDistance > 0) {
-                        event.preventDefault();
-                    }
-                }, { passive: false });
-
-                document.addEventListener('touchend', () => {
-                    if (pullDistance >= pullThreshold) {
-                        if (window.parent && typeof window.parent.reload_logs_iframe === 'function') {
-                            window.parent.reload_logs_iframe();
-                        } else if (window.parent) {
-                            window.parent.location.reload();
-                        }
-                    }
-                    pullStartY = 0;
-                    pullDistance = 0;
-                });
-            </script>
-        </head>
-        <body>""" + logcontent.replace("\n","<br />\n") + "</body></html>"
-    else:
-        return "<html><body>No logs</body></html>"
+            return f.read()
+    return ""
 app.mount('/', StaticFiles(directory="./static", html=True), name="static")
 
 if isfile(settingsFileName):
@@ -368,5 +313,3 @@ else:
     #Create new default settings
     settings = Settings(job_enabled=True)
     startJobs()
-
-

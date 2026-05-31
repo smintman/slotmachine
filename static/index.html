@@ -1,213 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes, height=device-height">
-  <meta name="theme-color" content="black" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Slot Machine">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="description" content="">
-  <meta name="author" content="Tim Dunne">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
-  <title>Slot Machine</title>
-  <script>
-
-    function about() {
-      alert("Slot Machine v3.0\n\n Author: Tim Dunne\n\n Github: https://github.com/smintman/slotmachine");
-    }
-
-    function reload_logs_iframe() {
-      const iframe = document.getElementById("logsFrame");
-      if (iframe) {
-        iframe.contentWindow.location.reload();
-      }
-    }
-
-    function updateBatteryColor(level) {
-      const batteryElement = document.getElementById("batteryLevel");
-      if (level >= 81) {
-        batteryElement.style.color = "#00ff00"; // Green
-      } else if (level >= 51) {
-        batteryElement.style.color = "#ffff00"; // Yellow
-      } else if (level >= 21) {
-        batteryElement.style.color = "#ff8800"; // Orange
-      } else {
-        batteryElement.style.color = "#ff0000"; // Red
-      }
-    }
-
-    async function get_job_status() {
-      const response = await fetch("/api/job_status");
-      const enabled = await response.json();
-      const jobsSwitch = document.getElementById("jobsSwitch");
-      jobsSwitch.checked = enabled;
-    }
-
-    async function toggle_job() {
-      const response = await fetch("/api/toggle_Job", {
-        method: "POST",
-        headers: {
-          "accept": "application/json",
-        },
-      });
-      const enabled = await response.json();
-      const jobsSwitch = document.getElementById("jobsSwitch");
-      jobsSwitch.checked = enabled;
-
-      reload_logs_iframe();
-    }
-
-    function clear_logs() {
-
-      fetch("/api/clear_logs",
-        {
-          method: "POST",
-          headers: {
-            "accept": "application/json",
-          },
-        })
-        .then((response) => response.json())
-        .then((json) => console.log(json));
-
-        reload_logs_iframe();
-    }
-
-    async function check_car(flashlights = false) {
-      let response;
-      if (flashlights) {
-        if (!confirm("Flashing the lights may help wake the car if it's asleep, but use this option sparingly to avoid unnecessary wear on the lights. Do you want to proceed?")) {
-          return;
-        }
-        response = await fetch("/api/check_car_with_flashlights");
-      }
-      else {
-        response = await fetch("/api/check_car");
-      }
-
-      carStatus = await response.json();
-
-      if (carStatus.lightsFlashSent) {
-        alert("Lights were flashed to try and wake the car. Check logs for more details.");
-      }
-
-      document.getElementById("batteryLevel").innerText = carStatus.batteryLevel;
-      document.getElementById("chargeStatus").innerText = carStatus.chargeStatus;
-      updateBatteryColor(carStatus.batteryLevel);
-
-      reload_logs_iframe();
-    }
-
-    let pullStartY = 0;
-    let pullDistance = 0;
-    const pullThreshold = 80;
-    let pullEnabled = false;
-
-    function initPullToRefresh() {
-      const iframe = document.getElementById("logsFrame");
-      if (!iframe) return;
-
-      iframe.addEventListener('touchstart', (event) => {
-        pullEnabled = true;
-        pullStartY = event.touches[0].clientY;
-        pullDistance = 0;
-      }, { passive: true });
-
-      iframe.addEventListener('touchmove', (event) => {
-        if (!pullEnabled) return;
-        pullDistance = event.touches[0].clientY - pullStartY;
-      }, { passive: true });
-
-      iframe.addEventListener('touchend', () => {
-        if (pullEnabled && pullDistance >= pullThreshold) {
-          reload_logs_iframe();
-        }
-        pullEnabled = false;
-        pullDistance = 0;
-      });
-    }
-
-    var batteryLevel = 0;
-    var chargeStatus = "Unknown";
-
-    window.onload = function() {
-      get_job_status();
-      check_car();
-      initPullToRefresh();
-    };
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine Dashboard</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+        .header { background: #1f1f1f; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .status-info { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; background: #666668; color: white; cursor: pointer; font-weight:lighter; transition: background 0.2s; }
+        button:hover { background: #464647; }
+        button.danger { background: #ff002f; color: #ffffff; }
+        button.danger:hover { background: #d10438; }
+        .status-item { font-size: 0.85rem; font-weight: lighter; margin-right: 15px; }
+        #status-indicator { font-size: 0.85rem; color: #ffffff; margin-right: 15px; font-weight: lighter; }
+        #battery-indicator { color: #ffeb3b; }
+        #charge-indicator { color: #ffffff; }
+        #logs-container { flex: 1; padding: 1rem; padding-bottom: 3rem; overflow-y: auto; background: #000; color: #ff9d00; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+        #refresh-timestamp { background: #1f1f1f; color: #888; font-size: 0.75rem; padding: 5px 1.5rem; border-top: 1px solid #333; }
+        h2 { margin: 0; color: #ffffff; letter-spacing: 1px; }
+    </style>
 </head>
-
 <body>
-
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark" .>
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Slot machine</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item d-flex align-items-center">
-            <div class="form-check form-switch text-white">
-              <label class="form-check-label" for="jobsSwitch">Job Status</label>
-              <input class="form-check-input" type="checkbox" role="switch" id="jobsSwitch" onchange="toggle_job();">
+    <div class="header">
+        <div class="header-top">
+            <h2>Dacia spring: Slot Machine</h2>
+            <div class="status-info">
+                <span id="battery-indicator" class="status-item"><b>Battery:</b> --%</span>
+                <span id="charge-indicator" class="status-item"><b>Charge:</b> --</span>
+                <span id="status-indicator"><b>Jobs:</b> Checking...</span>
             </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="clear_logs();document.location.reload();">Clear Logs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="reload_logs_iframe();">Refresh Logs</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="check_car();">Check Car</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="check_car(true);">Flash Lights</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="about();">About</a>
-          </li>
-
-        </ul>
-
-      </div>
-
+        </div>
+        <div class="controls">
+            <button onclick="toggleJob()">Toggle Jobs</button>
+            <button onclick="checkCar(false)">Check Car</button>
+            <button onclick="checkCar(true)">Check & Flash</button>
+            <button class="danger" onclick="clearLogs()">Clear Logs</button>
+        </div>
     </div>
-  </nav>
-
-  <footer>
-    <div style="display: flex; gap: 40px; align-items: center; padding: 0 20px;">
-      <div>
-        <span style="font-weight: bold;">Battery Level:</span>
-        <span id="batteryLevel" style="margin-left: 10px;">0</span>%
-      </div>
-      <div>
-        <span style="font-weight: bold;">Charge Status:</span>
-        <span id="chargeStatus" style="margin-left: 10px;">Unknown</span>
-      </div>
+    <div id="logs-container">Initialising system dashboard...</div>
+    <div id="refresh-timestamp">
+        Last updated: --:--:--
     </div>
-  </footer>
 
-  <main role="main" class="container" style="height:calc(100vh - 56px - 60px);max-width:100vw;">
-    <div class="jumbotron" style="height:100%;">
-      <iframe id="logsFrame" src="/api/logs" title="Logs"></iframe>
-    </div>
-  </main>
+    <script>
 
+        function updateBatteryColor(level) {
+        const batteryElement = document.getElementById("battery-indicator");
+        if (level >= 81) {
+            batteryElement.style.color = "#00ff00"; // Green
+        } else if (level >= 51) {
+            batteryElement.style.color = "#ffff00"; // Yellow
+        } else if (level >= 21) {
+            batteryElement.style.color = "#ff8800"; // Orange
+        } else {
+            batteryElement.style.color = "#ff0000"; // Red
+        }
+        }
+        async function updateStatus() {
+            try {
+                const res = await fetch('/api/job_status');
+                const enabled = await res.json();
+                document.getElementById('status-indicator').innerHTML = `<b>Jobs:</b> ${enabled ? 'Running' : 'Stopped'}`;
+            } catch (err) {
+                console.error("Status check failed", err);
+            }
+        }
 
+        async function refreshLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const text = await response.text();
+                const container = document.getElementById('logs-container');
+                // Only update and scroll if content has actually changed
+                if (container.textContent !== text) {
+                    container.textContent = text || "No logs available.";
+                    container.scrollTop = container.scrollHeight;
+                }
+                // Update refresh timestamp
+                const now = new Date();
+                document.getElementById('refresh-timestamp').innerHTML = `Last updated: ${now.toLocaleTimeString()}`;
+            } catch (err) {
+                console.error("Failed to fetch logs:", err);
+            }
+        }
 
-  <!-- Bootstrap JS Bundle (includes Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
-    integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
-    crossorigin="anonymous"></script>
+        async function toggleJob() {
+            await fetch('/api/toggle_Job', { method: 'POST' });
+            updateStatus();
+            refreshLogs();
+        }
 
+        async function clearLogs() {
+            if (confirm("Are you sure you want to clear the logs?")) {
+                await fetch('/api/clear_logs', { method: 'POST' });
+                refreshLogs();
+            }
+        }
+
+        async function checkCar(flash) {
+            const endpoint = flash ? '/api/check_car_with_flashlights' : '/api/check_car';
+            const response = await fetch(endpoint);
+            const data = await response.json();
+            
+            if (data.batteryLevel !== undefined) {
+                document.getElementById('battery-indicator').innerHTML = `<b>Battery:</b> ${data.batteryLevel}%`;
+                document.getElementById('charge-indicator').innerHTML = `<b>Charge:</b> ${data.chargeStatus}`;
+            }
+
+            updateBatteryColor(data.batteryLevel)
+            refreshLogs();
+        }
+
+        setInterval(refreshLogs, 60000);
+        checkCar(false);
+        refreshLogs();
+        updateStatus();
+    </script>
 </body>
-
 </html>
