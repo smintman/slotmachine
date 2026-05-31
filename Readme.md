@@ -9,8 +9,7 @@ The service, runs and at set times checks octput api to see if user is in the sl
 If in a slot we then check to see if the car is charging, if not then it will flash the cars
 lights.
 
-<img width="795" height="638" alt="Screenshot 2026-05-28 at 19 50 55" src="https://github.com/user-attachments/assets/d58909a5-b923-471f-b8f9-22c91190b091" />
-
+<img width="813" height="544" alt="Screenshot 2026-05-31 at 23 09 07" src="https://github.com/user-attachments/assets/fc712607-4d9d-4b4e-92a4-ab95c52020b7" />
 
 # set up
 
