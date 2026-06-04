@@ -6,8 +6,8 @@ from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
 from os.path import isfile
+from pathlib import Path
 from renault_api.renault_client import RenaultClient
 from renault_api.kamereon import enums
 import os
@@ -18,18 +18,19 @@ import logging
 from datetime import date, datetime,timezone,timedelta
 from zoneinfo import ZoneInfo
 
+# Define absolute paths relative to this file
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(exist_ok=True)
+
 email = os.environ['SM_Email']
 password = os.environ['SM_Password']
 apikey= os.environ['SM_OctAPI']
 accountNumber= os.environ['SM_OctAccNo']
 
 octopusGraphUrl = "https://api.octopus.energy/v1/graphql/"
-logFileName = "data/slotmachine.log"
-settingsFileName = "data/settings.json"
-
-# Ensure the data folder exists before writing logs or settings
-data_dir = os.path.dirname(logFileName)
-os.makedirs(data_dir, exist_ok=True)
+logFileName = str(DATA_DIR / "slotmachine.log")
+settingsFileName = str(DATA_DIR / "settings.json")
 
 # Configure logging
 logging.basicConfig(
@@ -72,11 +73,11 @@ def loadSettings():
     except FileNotFoundError:
         logger.info("Settings file not found, using default values.")
         saveSettings()  # Create a new settings file with default values
-        return Settings(job_enabled=False, login_token="")
+        return Settings(job_enabled=True, login_token="")
 
 def saveSettings():
     with open(settingsFileName, "w") as f:
-        return json.dump(settings.__dict__, f)
+        json.dump(settings.__dict__, f, indent=4)
 
 scheduler = AsyncIOScheduler()
 
@@ -253,7 +254,7 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
             client = RenaultClient(websession=websession, locale="en_GB")
           
             loadSettings()
-            if settings.login_token != "" and settings.login_token != None:
+            if settings.login_token:
               
                 try:
                     client.session.set_login_token(settings.login_token)
