@@ -1,3 +1,10 @@
+let currentZoomHours = 24;
+
+function setZoom(hours) {
+    currentZoomHours = hours;
+    refreshTimeline();
+}
+
 function updateBatteryColor(level) {
         const batteryElement = document.getElementById("battery-indicator");
         if (level >= 81) {
@@ -53,6 +60,79 @@ function updateBatteryColor(level) {
             }
         }
 
+        async function refreshTimeline() {
+            try {
+                const res = await fetch('/api/history');
+                const history = await res.json();
+                const container = document.getElementById('timeline-container');
+                container.innerHTML = '<div class="timeline-row row-slots"></div><div class="timeline-row row-charging"></div>';
+                
+                const slotRow = container.querySelector('.row-slots');
+                const chargeRow = container.querySelector('.row-charging');
+                
+                const now = new Date().getTime();
+                const zoomMs = currentZoomHours * 60 * 60 * 1000;
+                const startLimit = now - zoomMs;
+
+                // Update Labels
+                document.getElementById('label-start').textContent = `${currentZoomHours}h ago`;
+                document.getElementById('label-mid').textContent = `${currentZoomHours / 2}h ago`;
+
+                // Update Button States
+                document.querySelectorAll('.zoom-btn').forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.getAttribute('data-hours')) === currentZoomHours);
+                });
+
+                // Draw vertical grid lines every 30 minutes
+                const thirtyMinMs = 30 * 60 * 1000;
+                for (let t = Math.ceil(startLimit / thirtyMinMs) * thirtyMinMs; t <= now; t += thirtyMinMs) {
+                    const pos = ((t - startLimit) / zoomMs) * 100;
+                    const line = document.createElement('div');
+                    line.className = 'grid-line';
+                    line.style.left = `${pos}%`;
+                    container.appendChild(line);
+                }
+
+                history.forEach(entry => {
+                    const entryTime = new Date(entry.timestamp).getTime();
+                    const leftPos = ((entryTime - startLimit) / zoomMs) * 100;
+                    if (leftPos < 0 && entry.event !== 'slots_discovered') return;
+
+                    if (entry.event === 'slots_discovered') {
+                        entry.details.slots.forEach(slot => {
+                            const sStart = new Date(slot.startDt).getTime();
+                            const sEnd = new Date(slot.endDt).getTime();
+                            if (sEnd < startLimit || sStart > now) return;
+
+                            const sLeft = ((Math.max(sStart, startLimit) - startLimit) / zoomMs) * 100;
+                            const sWidth = ((Math.min(sEnd, now) - Math.max(sStart, startLimit)) / zoomMs) * 100;
+                            
+                            const div = document.createElement('div');
+                            div.className = 'segment seg-slot';
+                            div.style.left = `${sLeft}%`;
+                            div.style.width = `${sWidth}%`;
+                            const startDate = new Date(slot.startDt);
+                            const endDate = new Date(slot.endDt);
+                            div.title = `Slot: ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`;
+                            slotRow.appendChild(div);
+                        });
+                    } else if (entry.event === 'car_status_update' && entry.details.is_charging && leftPos >= 0) {
+                        // Show 30 min block for charging status
+                        const durationMs = 30 * 60 * 1000;
+                        const width = (durationMs / zoomMs) * 100;
+                        const div = document.createElement('div');
+                        div.className = 'segment seg-charge';
+                        div.style.left = `${leftPos}%`;
+                        div.style.width = `${width}%`;
+                        div.textContent = `${entry.details.battery_level}%`;
+                        const chargeTime = new Date(entry.timestamp);
+                        div.title = `Charging: ${chargeTime.toLocaleDateString()} ${chargeTime.toLocaleTimeString()} (${entry.details.battery_level}%)`;
+                        chargeRow.appendChild(div);
+                    }
+                });
+            } catch (err) { console.error("Timeline refresh failed", err); }
+        }
+
         async function checkCar(flash) {
             const endpoint = flash ? '/api/check_car_with_flashlights' : '/api/check_car';
             const response = await fetch(endpoint);
@@ -68,6 +148,8 @@ function updateBatteryColor(level) {
         }
 
         setInterval(refreshLogs, 60000);
+        setInterval(updateStatus, 60000);
         checkCar(false);
         refreshLogs();
         updateStatus();
+        refreshTimeline();

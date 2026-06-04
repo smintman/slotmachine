@@ -14,5 +14,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
         #battery-indicator { color: #ffeb3b; }
         #charge-indicator { color: #ffffff; }
         #logs-container { flex: 1; padding: 1rem; padding-bottom: 3rem; overflow-y: auto; background: #000; color: #ff9d00; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+        .timeline-section { background: #1a1a1a; padding: 10px 1.5rem; border-bottom: 1px solid #333; }
+        .zoom-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .zoom-btn { padding: 4px 12px; font-size: 0.7rem; background: #333; border: 1px solid #444; }
+        .zoom-btn.active { background: #0277bd; border-color: #03a9f4; }
+        .timeline-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 5px; }
+        .timeline { position: relative; height: 40px; background: #000; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
+        .timeline-row { position: absolute; width: 100%; height: 50%; }
+        .row-slots { top: 0; border-bottom: 1px solid #222; }
+        .row-charging { top: 50%; }
+        .segment { position: absolute; height: 100%; opacity: 0.8; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; white-space: nowrap; }
+        .grid-line { position: absolute; top: 0; height: 100%; width: 1px; background: rgba(255, 255, 255, 0.08); pointer-events: none; z-index: 5; }
+        .seg-slot { background: #4a148c; border-left: 1px solid #7b1fa2; }
+        .seg-charge { background: #0277bd; border-left: 1px solid #0288d1; }
         .footer-info { background: #1f1f1f; color: #888; font-size: 0.75rem; padding: 5px 1.5rem; border-top: 1px solid #333; display: flex; justify-content: space-between; }
+        .legend { display: flex; gap: 15px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .key-color { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+        .key-slot { background: #4a148c; }
+        .key-charge { background: #0277bd; }
         h2 { margin: 0; color: #ffffff; letter-spacing: 1px; }

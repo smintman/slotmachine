@@ -19,13 +19,28 @@
             <button id="running-button" class="running" onclick="toggleJob()">Running</button>
             <button onclick="checkCar(false)">Check Car</button>
             <button onclick="checkCar(true)">Check & Flash</button>
-            <button onclick="refreshLogs()">Refresh</button>
+            <button onclick="refreshLogs(); refreshTimeline();">Refresh</button>
             <button class="danger" onclick="clearLogs()">Clear Logs</button>
         </div>
+    </div>
+    <div class="timeline-section">
+        <div class="zoom-controls">
+            <button class="zoom-btn" data-hours="48" onclick="setZoom(48)">2 Days</button>
+            <button class="zoom-btn active" data-hours="24" onclick="setZoom(24)">24h</button>
+            <button class="zoom-btn" data-hours="8" onclick="setZoom(8)">8h</button>
+        </div>
+        <div class="timeline-labels">
+            <span id="label-start">24h ago</span><span id="label-mid">12h ago</span><span>Now</span>
+        </div>
+        <div id="timeline-container" class="timeline"></div>
     </div>
     <div id="logs-container">Initialising system dashboard...</div>
     <div class="footer-info">
         <div id="refresh-timestamp">Last refreshed: --:--:--</div>
+        <div class="legend">
+            <span class="legend-item"><span class="key-color key-slot"></span> Octopus Slot</span>
+            <span class="legend-item"><span class="key-color key-charge"></span> Car Charging</span>
+        </div>
         <div id="version-info">Version: 3.2.0</div>
     </div>
 

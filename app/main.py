@@ -31,6 +31,7 @@ accountNumber= os.environ['SM_OctAccNo']
 octopusGraphUrl = "https://api.octopus.energy/v1/graphql/"
 logFileName = str(DATA_DIR / "slotmachine.log")
 settingsFileName = str(DATA_DIR / "settings.json")
+historyFileName = str(DATA_DIR / "history.jsonl")
 
 # Configure logging
 logging.basicConfig(
@@ -46,6 +47,16 @@ logger = logging.getLogger(__name__)
 # Suppress noise from the underlying web server (uvicorn/h11)
 logging.getLogger("uvicorn.error").setLevel(logging.ERROR)
 logging.getLogger("h11").setLevel(logging.ERROR)
+
+def add_history_entry(event_type: str, details: dict):
+    """Appends a new event entry to the history file."""
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "event": event_type,
+        "details": details
+    }
+    with open(historyFileName, "a") as f:
+        f.write(json.dumps(entry) + "\n")
 
 dateTimeToUse = datetime.now().astimezone()
 if dateTimeToUse.hour < 17:
@@ -228,6 +239,9 @@ async def checkSlot(session):
             slots += (f"End time: {time['endDt']}\n")
             slots += (f"===============================\n")
 
+    # Record slots in history
+    add_history_entry("slots_discovered", {"slots": times})
+
     logger.info(slots)
 
     timeNow = datetime.now(timezone.utc).astimezone(ZoneInfo("Europe/London"))
@@ -309,6 +323,13 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
             else:
                 logger.info(f"Unknown state: {chargeStatus}") 
             
+            # Record car status in history
+            add_history_entry("car_status_update", {
+                "battery_level": batteryStatus.batteryLevel,
+                "charge_status": chargeStatusReturn,
+                "is_charging": charging
+            })
+
             if overrideFlashlights:
                 logger.info(f"Start Lights to try and wake car: {await vehicle.start_lights()}")
                 lightsFlashSent = True
@@ -364,6 +385,22 @@ async def get_logs():
         with open(logFileName, "r") as f:
             return f.read()
     return ""
+
+@app.get("/api/history")
+async def get_history():
+    if not isfile(historyFileName):
+        return []
+    limit = datetime.now(timezone.utc) - timedelta(hours=48)
+    history = []
+    with open(historyFileName, "r") as f:
+        for line in f:
+            try:
+                entry = json.loads(line)
+                if datetime.fromisoformat(entry["timestamp"]) > limit:
+                    history.append(entry)
+            except: continue
+    return history
+
 app.mount('/', StaticFiles(directory="./static", html=True), name="static")
 
 # Initialize settings at module level
