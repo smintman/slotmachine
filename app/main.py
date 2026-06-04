@@ -33,6 +33,12 @@ logFileName = str(DATA_DIR / "slotmachine.log")
 settingsFileName = str(DATA_DIR / "settings.json")
 historyFileName = str(DATA_DIR / "history.jsonl")
 
+# Custom converter to ensure log timestamps are in Europe/London (BST/GMT)
+def london_time_converter(secs):
+    return datetime.fromtimestamp(secs, tz=ZoneInfo("Europe/London")).timetuple()
+
+logging.Formatter.converter = london_time_converter
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -118,7 +124,8 @@ def cleanup_old_logs():
     if not isfile(logFileName):
         return
 
-    threshold = datetime.now() - timedelta(days=2)
+    # Create threshold in London time and strip tzinfo for comparison with strptime result
+    threshold = datetime.now(ZoneInfo("Europe/London")).replace(tzinfo=None) - timedelta(days=2)
     new_lines = []
     
     try:
@@ -385,6 +392,18 @@ async def get_logs():
         with open(logFileName, "r") as f:
             return f.read()
     return ""
+
+@app.get("/api/next_run")
+async def get_next_run():
+    next_runs = []
+    for job_id in ['job1', 'job2']:
+        job = scheduler.get_job(job_id)
+        if job and job.next_run_time:
+            next_runs.append(job.next_run_time)
+    if next_runs:
+        earliest = min(next_runs)
+        return earliest.astimezone(ZoneInfo("Europe/London")).strftime("%H:%M:%S")
+    return "Not scheduled"
 
 @app.get("/api/history")
 async def get_history():

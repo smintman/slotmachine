@@ -11,10 +11,27 @@ jobs:
   build:
 
     runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
 
     steps:
     - name: Check out the repository 
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Update Version in index.html
+      run: |
+        # Using sed to replace the Version: X.X.X with the current run number
+        sed -i "s/Version: [0-9.]*/Version: 3.2.${{ github.run_number }}/" static/index.html
+
+    - name: Commit and push version bump
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add static/index.html
+        git commit -m "chore: bump build version to 3.3.${{ github.run_number }} [skip ci]" || echo "No changes to commit"
+        git push
       
     - name: Log in to Docker Hub
       uses: docker/login-action@v4
@@ -28,4 +45,3 @@ jobs:
           context: .
           push: true
           tags: smintman/slotmachine:latest
-

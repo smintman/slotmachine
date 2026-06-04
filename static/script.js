@@ -24,6 +24,11 @@ function updateBatteryColor(level) {
                 var runningButton = document.getElementById('running-button');
                 runningButton.className = enabled ? 'running' : 'stopped';
                 runningButton.textContent = enabled ? 'Running' : 'Idle';
+
+                // Fetch next run time
+                const nextRes = await fetch('/api/next_run');
+                const nextRun = await nextRes.json();
+                document.getElementById('next-run').textContent = `Next run: ${nextRun}`;
             } catch (err) {
                 console.error("Status check failed", err);
             }
