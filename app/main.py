@@ -49,8 +49,9 @@ ioStart = dateTimeToUse.astimezone().replace(hour=23, minute=30, second=0, micro
 ioEnd = dateTimeToUse.astimezone().replace(microsecond=0).replace(hour=5, minute=30, second=0, microsecond=0)+timedelta(days = 1)
 
 class Settings:
-    def __init__(self, job_enabled: bool):
+    def __init__(self, job_enabled: bool, login_token: str = ""):
         self.job_enabled = job_enabled
+        self.login_token = login_token
 
 class CarStatus:
     def __init__(self, batteryLevel: int, chargeStatus: str, charging: bool = False, lightsFlashSent: bool = False):
@@ -206,7 +207,31 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
 
             client = RenaultClient(websession=websession, locale="en_GB")
           
-            await client.session.login(email, password)
+            loadSettings()
+            if settings.login_token != "" or settings.login_token != None:
+              
+                try:
+                    client.session.set_login_token(settings.login_token)
+                    logger.info("Logged in with saved token.")
+                except Exception as err:
+                    logger.error(f"Error logging in with saved token: {err}")
+                    logger.info("Falling back to email/password login.")
+                    await client.session.login(email, password)
+                    # Save the login token to settings for potential future use
+                    login_token = client.session.login_token 
+                    settings.login_token = login_token
+                    saveSettings()
+            else:
+                try:
+                    await client.session.login(email, password)
+                    # Save the login token to settings for potential future use
+                    login_token = client.session.login_token 
+                    settings.login_token = login_token
+                    saveSettings()
+                    logger.info("Logged in with email and password.")
+                except Exception as err:
+                    logger.error(f"Error logging in with email and password: {err}")
+                    return CarStatus(batteryLevel=0, chargeStatus="Login Failed", charging=False, lightsFlashSent=False)
 
             account = (await client.get_api_accounts())[0] #get first account
             vehicle = (await account.get_api_vehicles())[0] #get first vehicle     
