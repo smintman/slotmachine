@@ -1,5 +1,5 @@
 
-FROM arm64v8/python:3.9-alpine
+FROM arm64v8/python:3.12-alpine
 
 
 WORKDIR /app
