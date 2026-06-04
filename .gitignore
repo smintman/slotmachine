@@ -211,3 +211,4 @@ settings.json
 slotmachine.log
 slot-machine.tar
 .DS_Store
+history.jsonl
