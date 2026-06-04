@@ -61,9 +61,14 @@ class CarStatus:
         self.lightsFlashSent = lightsFlashSent
 
 def loadSettings():
-    with open(settingsFileName, "r") as f:
-        data = json.load(f)
-        return Settings(**data)
+    try:
+        with open(settingsFileName, "r") as f:
+            data = json.load(f)
+            return Settings(**data)
+    except FileNotFoundError:
+        logger.info("Settings file not found, using default values.")
+        saveSettings()  # Create a new settings file with default values
+        return Settings(job_enabled=False, login_token="")
 
 def saveSettings():
     with open(settingsFileName, "w") as f:
@@ -208,7 +213,7 @@ async def checkCar(overrideSlot: bool = False, overrideFlashlights: bool = False
             client = RenaultClient(websession=websession, locale="en_GB")
           
             loadSettings()
-            if settings.login_token != "" or settings.login_token != None:
+            if settings.login_token != "" and settings.login_token != None:
               
                 try:
                     client.session.set_login_token(settings.login_token)
