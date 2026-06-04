@@ -1,4 +1,6 @@
-# Currently broken renault just introduced 2 factor auth which we will need to update for. Will do as soon as renaul api has been updated.
+# Currently made some changes to help with tfa
+
+Still trying to understand how this is working. but seems that if you have logged in on same network/device if might not challege you?
 
 # slot machine
 
