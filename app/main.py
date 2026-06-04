@@ -42,6 +42,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Suppress noise from the underlying web server (uvicorn/h11)
+logging.getLogger("uvicorn.error").setLevel(logging.ERROR)
+logging.getLogger("h11").setLevel(logging.ERROR)
+
 dateTimeToUse = datetime.now().astimezone()
 if dateTimeToUse.hour < 17:
     dateTimeToUse = dateTimeToUse-timedelta(days=1)
@@ -110,6 +114,10 @@ def cleanup_old_logs():
             lines = f.readlines()
         
         for line in lines:
+            # Filter out server noise/malformed request logs
+            if "Invalid HTTP request received" in line:
+                continue
+                
             try:
                 # Extract date part: 2025-02-17 14:30:05
                 date_str = line.split(',')[0].split(' : ')[0]
@@ -163,7 +171,7 @@ async def refreshToken(session, apikey):
     """
     variables = {'api': apikey}
     async with session.post(octopusGraphUrl, json={'query': query, 'variables': variables}) as response:
-        response.raise_for_status()
+        # response.raise_for_status()
         jsonResponse = await response.json()
         return jsonResponse['data']['obtainKrakenToken']['token']
 
