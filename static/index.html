@@ -4,120 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slot Machine Dashboard</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
-        .header { background: #1f1f1f; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .status-info { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
-        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        button { padding: 8px 16px; border: none; border-radius: 4px; background: #666668; color: white; cursor: pointer; font-weight:lighter; transition: background 0.2s; }
-        button:hover { background: #464647; }
-        button.danger { background: #ff002f; color: #ffffff; }
-        button.danger:hover { background: #d10438; }
-        .status-item { font-size: 0.85rem; font-weight: lighter; margin-right: 15px; }
-        #status-indicator { font-size: 0.85rem; color: #ffffff; margin-right: 15px; font-weight: lighter; }
-        #battery-indicator { color: #ffeb3b; }
-        #charge-indicator { color: #ffffff; }
-        #logs-container { flex: 1; padding: 1rem; padding-bottom: 3rem; overflow-y: auto; background: #000; color: #ff9d00; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
-        #refresh-timestamp { background: #1f1f1f; color: #888; font-size: 0.75rem; padding: 5px 1.5rem; border-top: 1px solid #333; }
-        h2 { margin: 0; color: #ffffff; letter-spacing: 1px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="header">
         <div class="header-top">
-            <h2>Dacia spring: Slot Machine</h2>
+            <h2>Slot Machine</h2>
             <div class="status-info">
                 <span id="battery-indicator" class="status-item"><b>Battery:</b> --%</span>
-                <span id="charge-indicator" class="status-item"><b>Charge:</b> --</span>
-                <span id="status-indicator"><b>Jobs:</b> Checking...</span>
+                <span id="charge-indicator" class="status-item"><b>Status:</b> --</span>
             </div>
         </div>
         <div class="controls">
-            <button onclick="toggleJob()">Toggle Jobs</button>
+            <button id="running-button" class="running" onclick="toggleJob()">Running</button>
             <button onclick="checkCar(false)">Check Car</button>
             <button onclick="checkCar(true)">Check & Flash</button>
+            <button onclick="refreshLogs()">Refresh</button>
             <button class="danger" onclick="clearLogs()">Clear Logs</button>
         </div>
     </div>
     <div id="logs-container">Initialising system dashboard...</div>
-    <div id="refresh-timestamp">
-        Last updated: --:--:--
+    <div class="footer-info">
+        <div id="refresh-timestamp">Last refreshed: --:--:--</div>
+        <div id="version-info">Version: 3.1.0</div>
     </div>
 
-    <script>
-
-        function updateBatteryColor(level) {
-        const batteryElement = document.getElementById("battery-indicator");
-        if (level >= 81) {
-            batteryElement.style.color = "#00ff00"; // Green
-        } else if (level >= 51) {
-            batteryElement.style.color = "#ffff00"; // Yellow
-        } else if (level >= 21) {
-            batteryElement.style.color = "#ff8800"; // Orange
-        } else {
-            batteryElement.style.color = "#ff0000"; // Red
-        }
-        }
-        async function updateStatus() {
-            try {
-                const res = await fetch('/api/job_status');
-                const enabled = await res.json();
-                document.getElementById('status-indicator').innerHTML = `<b>Jobs:</b> ${enabled ? 'Running' : 'Stopped'}`;
-            } catch (err) {
-                console.error("Status check failed", err);
-            }
-        }
-
-        async function refreshLogs() {
-            try {
-                const response = await fetch('/api/logs');
-                const text = await response.text();
-                const container = document.getElementById('logs-container');
-                // Only update and scroll if content has actually changed
-                if (container.textContent !== text) {
-                    container.textContent = text || "No logs available.";
-                    container.scrollTop = container.scrollHeight;
-                }
-                // Update refresh timestamp
-                const now = new Date();
-                document.getElementById('refresh-timestamp').innerHTML = `Last updated: ${now.toLocaleTimeString()}`;
-            } catch (err) {
-                console.error("Failed to fetch logs:", err);
-            }
-        }
-
-        async function toggleJob() {
-            await fetch('/api/toggle_Job', { method: 'POST' });
-            updateStatus();
-            refreshLogs();
-        }
-
-        async function clearLogs() {
-            if (confirm("Are you sure you want to clear the logs?")) {
-                await fetch('/api/clear_logs', { method: 'POST' });
-                refreshLogs();
-            }
-        }
-
-        async function checkCar(flash) {
-            const endpoint = flash ? '/api/check_car_with_flashlights' : '/api/check_car';
-            const response = await fetch(endpoint);
-            const data = await response.json();
-            
-            if (data.batteryLevel !== undefined) {
-                document.getElementById('battery-indicator').innerHTML = `<b>Battery:</b> ${data.batteryLevel}%`;
-                document.getElementById('charge-indicator').innerHTML = `<b>Charge:</b> ${data.chargeStatus}`;
-            }
-
-            updateBatteryColor(data.batteryLevel)
-            refreshLogs();
-        }
-
-        setInterval(refreshLogs, 60000);
-        checkCar(false);
-        refreshLogs();
-        updateStatus();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

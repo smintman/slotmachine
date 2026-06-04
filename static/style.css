@@ -1,77 +1,18 @@
-
-:root {
-	--vh: 1vh;
-}
-
-html, body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	background: #111;
-	color: #c44343;
-}
-
-body {
-	display: flex;
-	flex-direction: column;
-	height: calc(var(--vh, 1vh) * 200);
-	min-height: 100%;
-	background: rgb(33, 37, 41);
-}
-
-footer {
-	flex-shrink: 0;
-	height: 60px;
-	display: flex;
-	align-items: center;
-	background-color: #333;
-	color: #fff;
-	font-size: 14px;
-}
-
-footer span[style*="font-weight"] {
-	color: #ffffff;
-}
-
-#batteryLevel {
-	font-weight: bold;
-	font-size: 16px;
-}
-
-#chargeStatus {
-	color: #00ffff;
-	font-weight: bold;
-	font-size: 14px;
-}
-
-main.container {
-	flex: 1 1 auto;
-	display: flex;
-	flex-direction: column;
-	padding: 0;
-	margin: 0;
-}
-
-.jumbotron {
-	flex: 1 1 auto;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
-
-iframe[title="Logs"] {
-	flex: 1 1 auto;
-	width: 100%;
-	height: 100%;
-	min-height: 0;
-	border: none;
-	background: #111;
-	color: orange;
-	font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', 'Courier New', Courier, monospace;
-	font-size: 1rem;
-	box-sizing: border-box;
-	touch-action: pan-y;
-	-webkit-overflow-scrolling: touch;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+        .header { background: #1f1f1f; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .status-info { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; background: #666668; color: white; cursor: pointer; font-weight:lighter; transition: background 0.2s; }
+        button:hover { background: #464647; }
+        button.danger { background: #ff002f; color: #ffffff; }
+        button.danger:hover { background: #d10438; }
+        button.running { background: #077635; color: #ffffff; }
+        button.running:hover { background: #0d6917; }
+        .status-item { font-size: 0.85rem; font-weight: lighter; margin-right: 15px; }
+        #status-indicator { font-size: 0.85rem; color: #ffffff; margin-right: 15px; font-weight: lighter; }
+        #battery-indicator { color: #ffeb3b; }
+        #charge-indicator { color: #ffffff; }
+        #logs-container { flex: 1; padding: 1rem; padding-bottom: 3rem; overflow-y: auto; background: #000; color: #ff9d00; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+        .footer-info { background: #1f1f1f; color: #888; font-size: 0.75rem; padding: 5px 1.5rem; border-top: 1px solid #333; display: flex; justify-content: space-between; }
+        h2 { margin: 0; color: #ffffff; letter-spacing: 1px; }
