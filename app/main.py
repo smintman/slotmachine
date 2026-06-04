@@ -98,10 +98,37 @@ def clearlogs():
      with open(logFileName, "w") as f:
         f.write("")
 
+def cleanup_old_logs():
+    if not isfile(logFileName):
+        return
+
+    threshold = datetime.now() - timedelta(days=2)
+    new_lines = []
+    
+    try:
+        with open(logFileName, 'r') as f:
+            lines = f.readlines()
+        
+        for line in lines:
+            try:
+                # Extract date part: 2025-02-17 14:30:05
+                date_str = line.split(',')[0].split(' : ')[0]
+                log_time = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+                if log_time > threshold:
+                    new_lines.append(line)
+            except (ValueError, IndexError):
+                # If a line doesn't have a timestamp (like a stack trace), keep it if we are keeping the previous block
+                if new_lines:
+                    new_lines.append(line)
+        
+        with open(logFileName, 'w') as f:
+            f.writelines(new_lines)
+        logger.info("Log cleanup completed. Kept logs from the last 2 days.")
+    except Exception as e:
+        print(f"Error cleaning logs: {e}")
+
 def startJobs():
-
     logger.info("Starting jobs")
-
     scheduler.add_job(checkCar, 'cron', 
                   day_of_week='*', 
                   hour='0-7', 
@@ -112,14 +139,19 @@ def startJobs():
                   hour='22-23', 
                   minute='05-35/30',id='job2')
     
+    scheduler.add_job(cleanup_old_logs, 'cron', 
+                  hour=3, minute=0, id='cleanup_job')
+    
 def stopJobs():
-
     logger.info("Stopping jobs")
     if scheduler.get_job('job1') != None:
         scheduler.remove_job('job1')
 
     if scheduler.get_job('job2') != None:
         scheduler.remove_job('job2')
+
+    if scheduler.get_job('cleanup_job') != None:
+        scheduler.remove_job('cleanup_job')
 
 async def refreshToken(session, apikey):
     query = """
