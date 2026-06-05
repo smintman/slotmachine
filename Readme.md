@@ -1,6 +1,7 @@
-# Currently made some changes to help with tfa
-
-Still trying to understand how this is working. but seems that if you have logged in on same network/device if might not challege you?
+> [!CAUTION]
+> **Important note of TFA**
+>
+> Renault have added mandatory TFA check on all accounts. The way around this for now is to login to the [my.dacia.com](https://www.dacia.co.uk/discover-mydacia.html) site on the same network that you are running the slotmachine code (or at least same public IP address) and follow the prompts to get email code. Make sure you click the 30 days tick box so it won't ask again for 30 days.
 
 # slot machine
 
