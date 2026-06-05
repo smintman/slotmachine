@@ -37,7 +37,7 @@ historyFileName = str(DATA_DIR / "history.jsonl")
 def london_time_converter(secs):
     return datetime.fromtimestamp(secs, tz=ZoneInfo("Europe/London")).timetuple()
 
-logging.Formatter.converter = london_time_converter
+logging.Formatter.converter = staticmethod(london_time_converter)
 
 # Configure logging
 logging.basicConfig(
