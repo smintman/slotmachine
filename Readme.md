@@ -1,6 +1,7 @@
-# Currently made some changes to help with tfa
-
-Still trying to understand how this is working. but seems that if you have logged in on same network/device if might not challege you?
+> [!CAUTION]
+> **Important note of TFA**
+>
+> Renault have added mandatory TFA check on all accounts. The way around this for now is to login to the [my.dacia.com](https://www.dacia.co.uk/discover-mydacia.html) site on the same network that you are running the slotmachine code (or at least same public IP address) and follow the prompts to get email code. Make sure you click the 30 days tick box so it won't ask again for 30 days.
 
 # slot machine
 
@@ -13,9 +14,13 @@ The service, runs and at set times checks octput api to see if user is in the sl
 If in a slot we then check to see if the car is charging, if not then it will flash the cars
 lights.
 
-<img width="813" height="544" alt="Screenshot 2026-05-31 at 23 09 07" src="https://github.com/user-attachments/assets/fc712607-4d9d-4b4e-92a4-ab95c52020b7" />
+## Latest changes
+- Added timeline that shows when slots are happening and when care actually charged.
 
-# set up
+<img width="886" height="573" alt="Screenshot 2026-06-05 at 19 20 16" src="https://github.com/user-attachments/assets/abf36782-99a1-4ff6-99cb-7232523a1ed9" />
+
+
+# Set up
 
 You need to set the following environment vars
 
@@ -40,7 +45,7 @@ pip install -r requirements.txt
 
 # Running the service
 
-To to terminal and run:
+Go to terminal and run:
 
 $ fastapi run app/main.py
 
