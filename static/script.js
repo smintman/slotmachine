@@ -76,12 +76,24 @@ function updateBatteryColor(level) {
                 const chargeRow = container.querySelector('.row-charging');
                 
                 const now = new Date().getTime();
-                const zoomMs = currentZoomHours * 60 * 60 * 1000;
-                const startLimit = now - zoomMs;
+                let startLimit, endLimit;
 
-                // Update Labels
-                document.getElementById('label-start').textContent = `${currentZoomHours}h ago`;
-                document.getElementById('label-mid').textContent = `${currentZoomHours / 2}h ago`;
+                if (currentZoomHours > 0) {
+                    startLimit = now - (currentZoomHours * 60 * 60 * 1000);
+                    endLimit = now;
+                    document.getElementById('label-start').textContent = `${currentZoomHours}h ago`;
+                    document.getElementById('label-mid').textContent = `${currentZoomHours / 2}h ago`;
+                    document.getElementById('label-end').textContent = `Now`;
+                } else {
+                    const hours = Math.abs(currentZoomHours);
+                    startLimit = now;
+                    endLimit = now + (hours * 60 * 60 * 1000);
+                    document.getElementById('label-start').textContent = `Now`;
+                    document.getElementById('label-mid').textContent = `In ${hours / 2}h`;
+                    document.getElementById('label-end').textContent = `In ${hours}h`;
+                }
+                
+                const zoomMs = endLimit - startLimit;
 
                 // Update Button States
                 document.querySelectorAll('.zoom-btn').forEach(btn => {
@@ -90,7 +102,7 @@ function updateBatteryColor(level) {
 
                 // Draw vertical grid lines every 30 minutes
                 const thirtyMinMs = 30 * 60 * 1000;
-                for (let t = Math.ceil(startLimit / thirtyMinMs) * thirtyMinMs; t <= now; t += thirtyMinMs) {
+                for (let t = Math.ceil(startLimit / thirtyMinMs) * thirtyMinMs; t <= endLimit; t += thirtyMinMs) {
                     const pos = ((t - startLimit) / zoomMs) * 100;
                     const line = document.createElement('div');
                     line.className = 'grid-line';
@@ -99,18 +111,14 @@ function updateBatteryColor(level) {
                 }
 
                 history.forEach(entry => {
-                    const entryTime = new Date(entry.timestamp).getTime();
-                    const leftPos = ((entryTime - startLimit) / zoomMs) * 100;
-                    if (leftPos < 0 && entry.event !== 'slots_discovered') return;
-
                     if (entry.event === 'slots_discovered') {
                         entry.details.slots.forEach(slot => {
                             const sStart = new Date(slot.startDt).getTime();
                             const sEnd = new Date(slot.endDt).getTime();
-                            if (sEnd < startLimit || sStart > now) return;
+                            if (sEnd < startLimit || sStart > endLimit) return;
 
                             const sLeft = ((Math.max(sStart, startLimit) - startLimit) / zoomMs) * 100;
-                            const sWidth = ((Math.min(sEnd, now) - Math.max(sStart, startLimit)) / zoomMs) * 100;
+                            const sWidth = ((Math.min(sEnd, endLimit) - Math.max(sStart, startLimit)) / zoomMs) * 100;
                             
                             const div = document.createElement('div');
                             div.className = 'segment seg-slot';
@@ -121,7 +129,11 @@ function updateBatteryColor(level) {
                             div.title = `Slot: ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`;
                             slotRow.appendChild(div);
                         });
-                    } else if (entry.event === 'car_status_update' && entry.details.is_charging && leftPos >= 0) {
+                    } else if (entry.event === 'car_status_update' && entry.details.is_charging) {
+                        const entryTime = new Date(entry.timestamp).getTime();
+                        if (entryTime < startLimit || entryTime > endLimit) return;
+
+                        const leftPos = ((entryTime - startLimit) / zoomMs) * 100;
                         // Show 30 min block for charging status
                         const durationMs = 30 * 60 * 1000;
                         const width = (durationMs / zoomMs) * 100;

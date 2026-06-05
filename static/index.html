@@ -28,9 +28,10 @@
             <button class="zoom-btn" data-hours="48" onclick="setZoom(48)">2 Days</button>
             <button class="zoom-btn active" data-hours="24" onclick="setZoom(24)">24h</button>
             <button class="zoom-btn" data-hours="8" onclick="setZoom(8)">8h</button>
+            <button class="zoom-btn" data-hours="-12" onclick="setZoom(-12)">Next 12h</button>
         </div>
         <div class="timeline-labels">
-            <span id="label-start">24h ago</span><span id="label-mid">12h ago</span><span>Now</span>
+            <span id="label-start">24h ago</span><span id="label-mid">12h ago</span><span id="label-end">Now</span>
         </div>
         <div id="timeline-container" class="timeline"></div>
     </div>
